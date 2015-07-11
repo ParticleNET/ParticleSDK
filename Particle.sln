@@ -3,7 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Particle", "Particle\Particle.csproj", "{3B8DFCCE-AFFA-407D-B2A7-62C33F61C165}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Particle", "Particle\Particle.csproj", "{987B4815-EED0-4C8C-870F-15D635CE7D6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleSDKTests", "ParticleSDKTests\ParticleSDKTests.csproj", "{BBF6B1B9-CB02-40B2-91AA-AD6C08333DDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{24FC2040-8351-48FD-8A30-B4C4BB9098CF}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C63C13E1-BC55-4945-B5A2-BD9632D5995D}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +25,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3B8DFCCE-AFFA-407D-B2A7-62C33F61C165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3B8DFCCE-AFFA-407D-B2A7-62C33F61C165}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3B8DFCCE-AFFA-407D-B2A7-62C33F61C165}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3B8DFCCE-AFFA-407D-B2A7-62C33F61C165}.Release|Any CPU.Build.0 = Release|Any CPU
+		{987B4815-EED0-4C8C-870F-15D635CE7D6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{987B4815-EED0-4C8C-870F-15D635CE7D6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{987B4815-EED0-4C8C-870F-15D635CE7D6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{987B4815-EED0-4C8C-870F-15D635CE7D6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBF6B1B9-CB02-40B2-91AA-AD6C08333DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBF6B1B9-CB02-40B2-91AA-AD6C08333DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBF6B1B9-CB02-40B2-91AA-AD6C08333DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBF6B1B9-CB02-40B2-91AA-AD6C08333DDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
