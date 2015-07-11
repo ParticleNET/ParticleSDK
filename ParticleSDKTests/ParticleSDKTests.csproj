@@ -41,7 +41,12 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sannel.TestHelpers, Version=1.1.1.0, Culture=neutral, PublicKeyToken=8954723059666fab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sannel.TestHelpers.1.1.1\lib\net4\Sannel.TestHelpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
@@ -66,11 +71,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ParticleCloudTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="DeveloperSettings.config" />
+    <None Include="DeveloperSettings.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
