@@ -31,7 +31,7 @@ namespace Particle
 		private AuthenticationResults authResults;
 
 		public ParticleCloud()
-			: this(new Uri("https://api.particle.io/"))
+			: this(new Uri("https://api.particle.io/v1/"))
 		{
 
 		}
