@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Particle.Results;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,120 @@ namespace Particle
 			client.BaseAddress = baseUri;
 		}
 
-		public async Task<LoginResult> LoginWithUserAsync(String username, String password)
+		public virtual async Task<RequestResponse> MakeGetRequestAsync(String method)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException("method");
+			}
+
+			if (authResults == null)
+			{
+				throw new ParticleAuthenticationExeption(String.Format("You must authenticate before calling {0}", method));
+			}
+
+
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+			HttpResponseMessage response = await client.GetAsync(method);
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		public virtual async Task<RequestResponse> MakePostRequestAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException("method");
+			}
+			
+			if(authResults == null)
+			{
+				throw new ParticleAuthenticationExeption(String.Format("You must authenticate before calling {0}", method));
+			}
+
+			
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+
+			HttpResponseMessage response;
+			if (arguments != null)
+			{
+				response = await client.PostAsync(method, new FormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PostAsync(method, null);
+			}
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		public Task<Result> RefreshTokenAsync()
+		{
+			if (authResults == null)
+			{
+				throw new ParticleAuthenticationExeption("You must login before we can refresh the token");
+			}
+
+			return LoginWithUserAsync(authResults.Username, authResults.Password, authResults.ExpiresIn);
+			/* The ideal way below does not currently appear to be currently supported.
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("particle:particle")));
+
+			var data = new Dictionary<String, String>();
+			data["refresh_token"] = authResults.RefreshToken;
+			data["grant_type"] = "refresh_token";
+			var postResults = await client.PostAsync("/oauth/token", new FormUrlEncodedContent(data));
+			if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var results = await postResults.Content.ReadAsStringAsync();
+				var ret = await Task.Run(() => JsonConvert.DeserializeObject<AuthenticationResults>(results));
+				if (ret != null)
+				{
+					if (!String.IsNullOrWhiteSpace(ret.AccessToken))
+					{
+						authResults = ret;
+						return new Result
+						{
+							Success = true
+						};
+					}
+				}
+			}
+			else if (postResults.StatusCode == System.Net.HttpStatusCode.BadRequest)
+			{
+				var results = await postResults.Content.ReadAsStringAsync();
+				var ret = await Task.Run(() => JsonConvert.DeserializeObject<Result>(results));
+				if (ret != null)
+				{
+					ret.Success = false;
+					return ret;
+				}
+			}
+
+			return new Result
+			{
+				Success = false,
+				Error = postResults.StatusCode.ToString()
+			};*/
+		}
+
+		/// <summary>
+		/// Logs into ParticleCloud with the given username and password
+		/// </summary>
+		/// <param name="username">Must be a valid email address</param>
+		/// <param name="password">The password for the user</param>
+		/// <returns>Result if Result.Success == true the user is logged in if its false the user is not logged in and ErrorMessage will contain the error from the server</returns>
+		public async Task<Result> LoginWithUserAsync(String username, String password, int expiresIn = 3600)
 		{
 			if (String.IsNullOrWhiteSpace(username))
 			{
@@ -61,6 +175,7 @@ namespace Particle
 			data["grant_type"] = "password";
 			data["username"] = username;
 			data["password"] = password;
+			data["expires_in"] = expiresIn.ToString();
 			var postResults = await client.PostAsync("/oauth/token", new FormUrlEncodedContent(data));
 			if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
 			{
@@ -71,9 +186,11 @@ namespace Particle
 					if (!String.IsNullOrWhiteSpace(ret.AccessToken))
 					{
 						authResults = ret;
-						return new LoginResult
+						authResults.Username = username;
+						authResults.Password = password;
+						return new Result
 						{
-							IsAuthenticated = true
+							Success = true
 						};
 					}
 				}
@@ -81,20 +198,17 @@ namespace Particle
 			else if (postResults.StatusCode == System.Net.HttpStatusCode.BadRequest)
 			{
 				var results = await postResults.Content.ReadAsStringAsync();
-				var ret = await Task.Run(() => JsonConvert.DeserializeObject<ErrorResult>(results));
+				var ret = await Task.Run(() => JsonConvert.DeserializeObject<Result>(results));
 				if (ret != null)
 				{
-					return new LoginResult
-					{
-						IsAuthenticated = false,
-						Error = ret.ErrorDescription
-					};
+					ret.Success = false;
+					return ret;
 				}
 			}
 
-			return new LoginResult
+			return new Result
 			{
-				IsAuthenticated = false,
+				Success = false,
 				Error = postResults.StatusCode.ToString()
 			};
 		}
@@ -121,10 +235,38 @@ namespace Particle
 		/// Get the list of devices the user has claimed
 		/// </summary>
 		/// <returns></returns>
-		//public async Task<List<ParticleDevice>> GetDevicesAsync()
-		//{
+		public async Task<List<ParticleDevice>> GetDevicesAsync()
+		{
+			var response = await MakeGetRequestAsync("devices");
+			if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				 response = await MakeGetRequestAsync("devices");
+				 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				 {
+					 throw new ParticleAuthenticationExeption("Please Login again");
+				 }
+			}
 
-		//}
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				List<ParticleDevice> items = new List<ParticleDevice>();
+				await Task.Run(() =>
+					{
+						foreach (JObject obj in (JArray)response.Response)
+						{
+							items.Add(new ParticleDevice(obj));
+						}
+					});
+
+				return items;
+			}
+			else
+			{
+				var result = response.Response.ToObject<Result>();
+				throw new ParticleException("Error retreving devices", response.StatusCode, result.Error, result.ErrorDescription);
+			}
+		}
 
 		/// <summary>
 		/// Gets the device with the id equal to <paramref name="deviceId"/>

@@ -37,10 +37,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="LoginResult.cs" />
+    <Compile Include="ParticleAuthenticationExeption.cs" />
     <Compile Include="ParticleCloud.cs" />
     <Compile Include="ParticleDevice.cs" />
     <Compile Include="ParticleDeviceType.cs" />
+    <Compile Include="ParticleException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestResponse.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Results\AuthenticationResults.cs" />
     <Compile Include="Results\ErrorResult.cs" />

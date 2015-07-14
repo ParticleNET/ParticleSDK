@@ -13,28 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Particle.Results
+namespace Particle
 {
-	internal class AuthenticationResults
+	public class ParticleAuthenticationExeption : ParticleException
 	{
-		[JsonProperty("token_type")]
-		public String TokenType { get; set; }
-		[JsonProperty("access_token")]
-		public String AccessToken { get; set; }
-		[JsonProperty("expires_in")]
-		public int ExpiresIn { get; set; }
-		[JsonProperty("refresh_token")]
-		public String RefreshToken { get; set; }
+		public ParticleAuthenticationExeption(String message)
+			: base(message)
+		{
 
-		public string Username { get; set; }
+		}
 
-		public string Password { get; set; }
+		public ParticleAuthenticationExeption(String message, Exception innerException) : base(message, innerException) { }
 	}
 }

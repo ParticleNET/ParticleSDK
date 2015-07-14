@@ -18,12 +18,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace Particle
 {
-	public enum ParticleDeviceType
+	public class ParticleException : Exception
 	{
-		SparkDeviceTypeCore = 0,
-		SparkDeviceTypePhoton = 6
+		public HttpStatusCode Status{ get; set; }
+		[JsonProperty("error")]
+		public String Error { get; set; }
+		[JsonProperty("error_description")]
+		public String ErrorDescription { get; set; }
+
+		public ParticleException(String message)
+			: base(message)
+		{
+
+		}
+
+		public ParticleException(String message, HttpStatusCode code, String error, String errorDescription)
+			: base(message)
+		{
+			this.Status = code;
+			this.Error = error;
+			this.ErrorDescription = errorDescription;
+		}
+
+		public ParticleException(String message, Exception innerException)
+			: base(message, innerException)
+		{
+
+		}
 	}
 }
