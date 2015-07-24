@@ -71,6 +71,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ParticleCloudMock.cs" />
     <Compile Include="ParticleCloudTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

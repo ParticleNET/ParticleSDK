@@ -71,5 +71,21 @@ namespace ParticleSDKTests
 				Assert.IsTrue(status.Success);
 			}
 		}
+
+		[TestMethod]
+		public async Task GetDevicesAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response=""
+					};
+				};
+			}
+		}
 	}
 }
