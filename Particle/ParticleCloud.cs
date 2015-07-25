@@ -31,6 +31,14 @@ namespace Particle
 		private Uri baseUri;
 		private AuthenticationResults authResults;
 
+		public bool IsAuthenticated
+		{
+			get
+			{
+				return authResults?.AccessToken?.Length > 0;
+			}
+		}
+
 		public ParticleCloud()
 			: this(new Uri("https://api.particle.io/v1/"))
 		{
