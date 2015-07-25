@@ -48,12 +48,12 @@ namespace Particle
 		{
 			if (String.IsNullOrWhiteSpace(method))
 			{
-				throw new ArgumentNullException("method");
+				throw new ArgumentNullException(nameof(method));
 			}
 
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(String.Format("You must authenticate before calling {0}", method));
+				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
 			}
 
 
@@ -72,12 +72,12 @@ namespace Particle
 		{
 			if (String.IsNullOrWhiteSpace(method))
 			{
-				throw new ArgumentNullException("method");
+				throw new ArgumentNullException(nameof(method));
 			}
 			
 			if(authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(String.Format("You must authenticate before calling {0}", method));
+				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
 			}
 
 			
@@ -105,7 +105,7 @@ namespace Particle
 		{
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption("You must login before we can refresh the token");
+				throw new ParticleAuthenticationExeption(Messages.YouMustLoginBeforeRefreshingToken);
 			}
 
 			return LoginWithUserAsync(authResults.Username, authResults.Password, authResults.ExpiresIn);
@@ -161,11 +161,11 @@ namespace Particle
 		{
 			if (String.IsNullOrWhiteSpace(username))
 			{
-				throw new ArgumentNullException("username");
+				throw new ArgumentNullException(nameof(username));
 			}
 			if (String.IsNullOrWhiteSpace(password))
 			{
-				throw new ArgumentNullException("password");
+				throw new ArgumentNullException(nameof(password));
 			}
 
 			client.DefaultRequestHeaders.Clear();
@@ -255,7 +255,7 @@ namespace Particle
 					{
 						foreach (JObject obj in (JArray)response.Response)
 						{
-							items.Add(new ParticleDevice(obj));
+							items.Add(new ParticleDevice(this, obj));
 						}
 					});
 
@@ -263,8 +263,7 @@ namespace Particle
 			}
 			else
 			{
-				var result = response.Response.ToObject<Result>();
-				throw new ParticleException("Error retreving devices", response.StatusCode, result.Error, result.ErrorDescription);
+				throw response.AsParticleException(Messages.ErrorRetrevingDevices);
 			}
 		}
 
@@ -308,9 +307,7 @@ namespace Particle
 		//{
 
 		//}
-
-
-
+		
 		public void Dispose()
 		{
 			client.Dispose();

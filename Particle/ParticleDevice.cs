@@ -25,22 +25,148 @@ namespace Particle
 {
 	public class ParticleDevice
 	{
+		private ParticleCloud cloud;
 		public String Id { get; internal set; }
 		public String Name { get; internal set; }
 		public String LastApp { get; internal set; }
 		public String LastIPAddress { get; internal set; }
-		public DateTime LastHeard { get; internal set; }
+		public DateTime? LastHeard { get; internal set; }
 		public ParticleDeviceType DeviceType { get; internal set; }
-		public bool IsConnected { get; internal set; }
+		public bool Connected { get; internal set; }
 
-		internal ParticleDevice(JObject obj)
+		internal protected ParticleDevice(ParticleCloud cloud, JObject obj)
 		{
+			if(cloud == null)
+			{
+				throw new ArgumentNullException(nameof(cloud));
+			}
+			this.cloud = cloud;
 			ParseObject(obj);
 		}
 
-		internal void ParseObject(JObject obj)
+		private String parseStringValue(JToken token)
 		{
+			if(token?.Type == JTokenType.String)
+			{
+				return token.Value<String>();
+			}
+			return null;
+		}
 
+		private DateTime? parseDateTimeValue(JToken token)
+		{
+			if(token?.Type == JTokenType.Date)
+			{
+				return token.Value<DateTime>();
+			}
+
+			return null;
+		}
+
+		private int parseIntValue(JToken token)
+		{
+			if(token?.Type == JTokenType.Integer)
+			{
+				return (int)token.Value<long>();
+			}
+			else if(token?.Type == JTokenType.Float)
+			{
+				return (int)token.Value<double>();
+			}
+
+			return 0;
+		}
+
+		private bool parseBooleanValue(JToken token)
+		{
+			if(token?.Type == JTokenType.Boolean)
+			{
+				return token.Value<Boolean>();
+			}
+			return false;
+		}
+
+		protected virtual void ParseVariables(JObject obj)
+		{
+			if(obj == null)
+			{
+				throw new ArgumentNullException(nameof(obj));
+			}
+
+			variables.Clear();
+
+			foreach(var prop in obj.Properties())
+			{
+				var name = prop.Name;
+				variables[name] = prop.Value?.ToString();
+			}
+		}
+
+		protected virtual void ParseFunctions(JArray arr)
+		{
+			if (arr == null)
+			{
+				throw new ArgumentNullException(nameof(arr));
+			}
+
+			functions.Clear();
+
+			foreach (var i in arr)
+			{
+				if (i.Type == JTokenType.String)
+				{
+					functions.Add(i.Value<String>());
+				}
+			}
+		}
+
+		protected virtual void ParseObject(JObject obj)
+		{
+			if(obj == null)
+			{
+				throw new ArgumentNullException(nameof(obj));
+			}
+
+			foreach(var prop in obj.Properties())
+			{
+				var name = prop.Name;
+				switch (name)
+				{
+					case "id":
+						Id = parseStringValue(prop.Value);
+						break;
+					case "name":
+						Name = parseStringValue(prop.Value);
+						break;
+					case "last_app":
+						LastApp = parseStringValue(prop.Value);
+						break;
+					case "last_ip_address":
+						LastIPAddress = parseStringValue(prop.Value);
+						break;
+					case "last_heard":
+						LastHeard = parseDateTimeValue(prop.Value);
+						break;
+					case "product_id":
+						DeviceType = (ParticleDeviceType)parseIntValue(prop.Value);
+						break;
+					case "connected":
+						Connected = parseBooleanValue(prop.Value);
+						break;
+					case "variables":
+						if(prop.Value?.Type == JTokenType.Object)
+						{
+							ParseVariables((JObject)prop.Value);
+						}
+						break;
+					case "functions":
+						if(prop.Value?.Type == JTokenType.Array)
+						{
+							ParseFunctions((JArray)prop.Value);
+						}
+						break;
+                }
+			}
 		}
 
 		private Dictionary<String, String> variables = new Dictionary<string, string>();
@@ -71,9 +197,34 @@ namespace Particle
 			throw new NotImplementedException();
 		}
 
-		public async Task<Result> RefreshAsync()
+		public async Task RefreshAsync()
 		{
-			throw new NotImplementedException();
+			var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await cloud.RefreshTokenAsync();
+				response = await cloud.MakeGetRequestAsync($"devices/{Id}");
+				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				{
+					throw new ParticleAuthenticationExeption(Messages.PleaseLoginAgain);
+				}
+			}
+
+			if(response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				if(response.Response?.Type == JTokenType.Object)
+				{
+					await Task.Run(() => ParseObject((JObject)response.Response));
+				}
+				else
+				{
+					throw new ParticleException(Messages.UnexpectedResponse);
+				}
+			}
+			else
+			{
+				throw response.AsParticleException(String.Format(Messages.ErrorRetreavingDeviceInfoForDevice, Id));
+			}
 		}
 
 		public async Task<Result> UnclaimAsync()

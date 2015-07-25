@@ -13,5 +13,16 @@ namespace Particle
 		public HttpStatusCode StatusCode { get; set; }
 
 		public JToken Response { get; set; }
+
+		public Result AsResult()
+		{
+			return Response.ToObject<Result>();
+		}
+
+		public ParticleException AsParticleException(String message)
+		{
+			var result = AsResult();
+			return new ParticleException(message, StatusCode, result.Error, result.ErrorDescription);
+		}
 	}
 }
