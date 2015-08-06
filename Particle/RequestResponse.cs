@@ -14,9 +14,18 @@ namespace Particle
 
 		public JToken Response { get; set; }
 
-		public Result AsResult()
+		public Result AsResult(bool success = false)
 		{
-			return Response.ToObject<Result>();
+			var result = Response.ToObject<Result>();
+			result.Success = success;
+			return result;
+		}
+
+		public Result<T> AsResult<T>(bool success = false)
+		{
+			var result = Response.ToObject<Result<T>>();
+			result.Success = success;
+			return result;
 		}
 
 		public ParticleException AsParticleException(String message)

@@ -28,32 +28,25 @@ namespace Universal
 		public MainPage()
 		{
 			this.InitializeComponent();
-			DataContext = AppSettings.Current;
 		}
 
-		private async void LoginAction_Tapped(object sender, TappedRoutedEventArgs e)
+		protected async override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			Authenticating.Visibility = Visibility.Visible;
-			try
+			base.OnNavigatedTo(e);
+			if (!App.Cloud.IsAuthenticated)
 			{
-				var result = await App.Cloud.LoginWithUserAsync(AppSettings.Current.Username, AppSettings.Current.Password);
-				if (!result.Success)
+				AuthenticationDialog dialog = new AuthenticationDialog();
+				var result = await dialog.ShowAsync();
+				if(result == ContentDialogResult.Primary)
 				{
-					MessageDialog dialog = new MessageDialog(result.ErrorDescription);
-					await dialog.ShowAsync();
-				}
-				else
-				{
-					this.Frame.Navigate(typeof(DevicesPage));
+					var dresults = await App.Cloud.GetDevicesAsync();
+					if (dresults.Success)
+					{
+						DevicesComboBox.ItemsSource = dresults.Data;
+						DevicesListView.ItemsSource = dresults.Data;
+					}
 				}
 			}
-			catch (ParticleException ex)
-			{
-				var dialog = new MessageDialog(ex.ToString());
-				await dialog.ShowAsync();
-			}
-
-			Authenticating.Visibility = Visibility.Collapsed;
 		}
 	}
 }

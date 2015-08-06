@@ -24,10 +24,37 @@ namespace Particle
 {
 	public class Result
 	{
+		public Result()
+		{
+
+		}
+
+		public Result(bool success)
+		{
+			Success = success;
+		}
+
 		public bool Success { get; set; }
 		[JsonProperty("error")]
 		public String Error { get; set; }
 		[JsonProperty("error_description")]
 		public String ErrorDescription { get; set; }
+	}
+
+	public class Result<T> : Result
+	{
+		public Result()
+		{
+
+		}
+
+		public Result(bool success) : base(success) { }
+
+		public Result(bool success, T data) : base(success)
+		{
+			Data = data;
+		}
+
+		public T Data { get; set; }
 	}
 }

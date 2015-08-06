@@ -165,7 +165,7 @@ namespace Particle
 							ParseFunctions((JArray)prop.Value);
 						}
 						break;
-                }
+				}
 			}
 		}
 
@@ -187,17 +187,17 @@ namespace Particle
 			}
 		}
 
-		public async Task<T> GetVariableValueAsync<T>(String variableName)
+		public async Task<Result<T>> GetVariableValueAsync<T>(String variableName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public async Task<int> CallFunctionAsync(String functionName, params String[] args)
+		public async Task<Result<int>> CallFunctionAsync(String functionName, params String[] args)
 		{
 			throw new NotImplementedException();
 		}
 
-		public async Task RefreshAsync()
+		public async Task<Result> RefreshAsync()
 		{
 			var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
 			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -206,7 +206,7 @@ namespace Particle
 				response = await cloud.MakeGetRequestAsync($"devices/{Id}");
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 				{
-					throw new ParticleAuthenticationExeption(Messages.PleaseLoginAgain);
+					return response.AsResult();
 				}
 			}
 
@@ -215,15 +215,20 @@ namespace Particle
 				if(response.Response?.Type == JTokenType.Object)
 				{
 					await Task.Run(() => ParseObject((JObject)response.Response));
+					return new Result(true);
 				}
 				else
 				{
-					throw new ParticleException(Messages.UnexpectedResponse);
+					return new Result()
+					{
+						Error = Messages.UnexpectedResponse,
+						ErrorDescription = response.Response?.ToString()
+					};
 				}
 			}
 			else
 			{
-				throw response.AsParticleException(String.Format(Messages.ErrorRetreavingDeviceInfoForDevice, Id));
+				return response.AsResult();
 			}
 		}
 

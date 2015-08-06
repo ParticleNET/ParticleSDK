@@ -114,8 +114,11 @@ namespace ParticleSDKTests
 					};
 				};
 
-				var devices = await cloud.GetDevicesAsync();
-				Assert.IsNotNull(devices);
+				var result = await cloud.GetDevicesAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				Assert.IsNotNull(result.Data);
+				var devices = result.Data;
 				Assert.AreEqual(3, devices.Count);
 				var device = devices[0];
 				Assert.AreEqual("1", device.Id);

@@ -25,7 +25,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual(null, p.Name);
 
 			obj = JObject.Parse(@"{'id': '356a',
-    'name': 'Work',
+	'name': 'Work',
 	'last_app': 'cheese',
 	'last_ip_address': '192.168.0.1',
 	'last_heard': '2015-05-25T01:15:36.034Z',
@@ -79,7 +79,7 @@ namespace ParticleSDKTests
 				{
 					StatusCode = System.Net.HttpStatusCode.OK,
 					Response = JToken.Parse(@"{'id': '3',
-    'name': 'Work',
+	'name': 'Work',
 	'last_app': 'cheese',
 	'last_ip_address': '192.168.0.1',
 	'last_heard': '2015-05-25T01:15:36.034Z',
@@ -98,7 +98,8 @@ namespace ParticleSDKTests
 			};
 
 			var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
-			await p.RefreshAsync();
+			var result = await p.RefreshAsync();
+			Assert.IsTrue(result.Success);
 			Assert.AreEqual("3", p.Id);
 			Assert.AreEqual("Work", p.Name);
 			Assert.AreEqual("cheese", p.LastApp);

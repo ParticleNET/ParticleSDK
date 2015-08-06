@@ -243,7 +243,7 @@ namespace Particle
 		/// Get the list of devices the user has claimed
 		/// </summary>
 		/// <returns></returns>
-		public async Task<List<ParticleDevice>> GetDevicesAsync()
+		public async Task<Result<List<ParticleDevice>>> GetDevicesAsync()
 		{
 			var response = await MakeGetRequestAsync("devices");
 			if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -252,7 +252,7 @@ namespace Particle
 				 response = await MakeGetRequestAsync("devices");
 				 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 				 {
-					 throw new ParticleAuthenticationExeption("Please Login again");
+					return response.AsResult<List<ParticleDevice>>();
 				 }
 			}
 
@@ -267,11 +267,11 @@ namespace Particle
 						}
 					});
 
-				return items;
+				return new Result<List<ParticleDevice>>(true, items);
 			}
 			else
 			{
-				throw response.AsParticleException(Messages.ErrorRetrevingDevices);
+				return response.AsResult<List<ParticleDevice>>();
 			}
 		}
 
