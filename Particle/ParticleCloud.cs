@@ -18,18 +18,22 @@ using Newtonsoft.Json.Linq;
 using Particle.Results;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Particle
 {
-	public class ParticleCloud : IDisposable
+	public class ParticleCloud : ParticleBase, IDisposable
 	{
 		private HttpClient client;
 		private Uri baseUri;
 		private AuthenticationResults authResults;
+
+		public static SynchronizationContext SyncContext { get; set; }
 
 		public bool IsAuthenticated
 		{

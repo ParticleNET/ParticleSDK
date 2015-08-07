@@ -50,16 +50,15 @@ namespace ParticleSDKTests
 			Assert.IsTrue(p.Connected);
 
 			Assert.AreEqual(3, p.Variables.Count);
-			var v = p.Variables.Keys.ToList();
-			var key = v[0];
-			Assert.AreEqual("temp", key);
-			Assert.AreEqual("double", p.Variables[key]);
-			key = v[1];
-			Assert.AreEqual("temp2", key);
-			Assert.AreEqual("int", p.Variables[key]);
-			key = v[2];
-			Assert.AreEqual("temp3", key);
-			Assert.AreEqual("string", p.Variables[key]);
+			var variable = p.Variables[0];
+			Assert.AreEqual("temp", variable.Name);
+			Assert.AreEqual("double", variable.Type);
+			variable = p.Variables[1];
+			Assert.AreEqual("temp2", variable.Name);
+			Assert.AreEqual("int", variable.Type);
+			variable = p.Variables[2];
+			Assert.AreEqual("temp3", variable.Name);
+			Assert.AreEqual("string", variable.Type);
 
 			var functions = p.Functions;
 			Assert.AreEqual(2, functions.Count);
@@ -109,16 +108,15 @@ namespace ParticleSDKTests
 			Assert.IsTrue(p.Connected);
 
 			Assert.AreEqual(3, p.Variables.Count);
-			var v = p.Variables.Keys.ToList();
-			var key = v[0];
-			Assert.AreEqual("temp", key);
-			Assert.AreEqual("double", p.Variables[key]);
-			key = v[1];
-			Assert.AreEqual("temp2", key);
-			Assert.AreEqual("int", p.Variables[key]);
-			key = v[2];
-			Assert.AreEqual("temp3", key);
-			Assert.AreEqual("string", p.Variables[key]);
+			var variable = p.Variables[0];
+			Assert.AreEqual("temp", variable.Name);
+			Assert.AreEqual("double", variable.Type);
+			variable = p.Variables[1];
+			Assert.AreEqual("temp2", variable.Name);
+			Assert.AreEqual("int", variable.Type);
+			variable = p.Variables[2];
+			Assert.AreEqual("temp3", variable.Name);
+			Assert.AreEqual("string", variable.Type);
 
 			var functions = p.Functions;
 			Assert.AreEqual(2, functions.Count);

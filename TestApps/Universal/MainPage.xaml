@@ -8,8 +8,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 	<Page.Resources>
-		<converters:VisibilityConverter x:Name="VisibilityConverter" />
-		<converters:VisibilityNotConverter x:Name="VisibilityNotConverter" />
+		
 		<local:ComboBoxItemTemplateSelector x:Key="ComboTemplateSelector">
 			<local:ComboBoxItemTemplateSelector.DropDownTemplate>
 				<DataTemplate>
@@ -46,9 +45,9 @@
 	</Page.Resources>
 	<RelativePanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 		<TextBlock x:Name="DevicesOutput" Margin="5" Style="{ThemeResource SubheaderTextBlockStyle}" Text="Devices" />
-		<local:AlternatingRowComboBox x:Name="DevicesComboBox" Margin="5" RelativePanel.Below="DevicesOutput" Visibility="Collapsed" ItemTemplateSelector="{StaticResource ResourceKey=ComboTemplateSelector}">
+		<local:AlternatingRowComboBox x:Name="DevicesComboBox" Margin="5" RelativePanel.Below="DevicesOutput" Visibility="Collapsed" ItemTemplateSelector="{StaticResource ResourceKey=ComboTemplateSelector}" SelectionChanged="DevicesComboBox_SelectionChanged">
 		</local:AlternatingRowComboBox>
-		<local:AlternatingRowListView x:Name="DevicesListView" Margin="5" RelativePanel.Below="DevicesOutput" HorizontalAlignment="Left">
+		<local:AlternatingRowListView x:Name="DevicesListView" Margin="5" RelativePanel.Below="DevicesOutput" HorizontalAlignment="Left" SelectionChanged="DevicesListView_SelectionChanged">
 			<local:AlternatingRowListView.ItemTemplate>
 				<DataTemplate>
 					<Grid HorizontalAlignment="Stretch">
@@ -72,7 +71,7 @@
 			</local:AlternatingRowListView.ItemTemplate>
 		</local:AlternatingRowListView>
 
-		<Frame x:Name="InternalFrame" RelativePanel.RightOf="DevicesListView">
+		<Frame x:Name="InternalFrame" RelativePanel.RightOf="DevicesListView" RelativePanel.Below="DevicesComboBox">
 
 		</Frame>
 

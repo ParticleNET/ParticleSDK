@@ -1,8 +1,12 @@
 ﻿<Application
-    x:Class="Universal.App"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Universal"
-    RequestedTheme="Light">
-
+	x:Class="Universal.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:Universal"
+	xmlns:converters="using:Universal.Converters"
+	RequestedTheme="Light">
+	<Application.Resources>
+		<converters:VisibilityConverter x:Name="VisibilityConverter" />
+		<converters:VisibilityNotConverter x:Name="VisibilityNotConverter" />
+	</Application.Resources>
 </Application>

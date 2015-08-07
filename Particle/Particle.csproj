@@ -36,12 +36,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="LoginResult.cs" />
     <Compile Include="Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Messages.resx</DependentUpon>
     </Compile>
+    <Compile Include="ParticleBase.cs" />
     <Compile Include="ParticleAuthenticationExeption.cs" />
     <Compile Include="ParticleCloud.cs" />
     <Compile Include="ParticleDevice.cs" />
@@ -52,6 +54,7 @@
     <Compile Include="Result.cs" />
     <Compile Include="Results\AuthenticationResults.cs" />
     <Compile Include="Results\ErrorResult.cs" />
+    <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

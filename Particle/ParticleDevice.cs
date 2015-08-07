@@ -17,26 +17,74 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Particle
 {
-	public class ParticleDevice
+	public class ParticleDevice : ParticleBase
 	{
 		private ParticleCloud cloud;
-		public String Id { get; internal set; }
-		public String Name { get; internal set; }
-		public String LastApp { get; internal set; }
-		public String LastIPAddress { get; internal set; }
-		public DateTime? LastHeard { get; internal set; }
-		public ParticleDeviceType DeviceType { get; internal set; }
-		public bool Connected { get; internal set; }
+		private String id;
+		public String Id
+		{
+			get { return id; }
+			internal set { SetProperty(ref id, value); }
+		}
+
+		private String name;
+		public String Name
+		{
+			get { return name; }
+			internal set { SetProperty(ref name, value); }
+		}
+
+		private String lastApp;
+		public String LastApp
+		{
+			get { return lastApp; }
+			internal set { SetProperty(ref lastApp, value); }
+		}
+
+		private String lastIPAddress;
+		public String LastIPAddress
+		{
+			get { return lastIPAddress; }
+			internal set { SetProperty(ref lastIPAddress, value); }
+		}
+
+		private DateTime? lastHeard;
+		public DateTime? LastHeard
+		{
+			get { return lastHeard; }
+			internal set { SetProperty(ref lastHeard, value); }
+		}
+
+		private ParticleDeviceType deviceType;
+		public ParticleDeviceType DeviceType
+		{
+			get { return deviceType; }
+			internal set { SetProperty(ref deviceType, value); }
+		}
+
+		private bool connected;
+		public bool Connected
+		{
+			get { return connected; }
+			internal set { SetProperty(ref connected, value); }
+		}
+
+		private ObservableCollection<Variable> variables = new ObservableCollection<Variable>();
+		public ObservableCollection<Variable> Variables
+		{
+			get { return variables; }
+		}
 
 		internal protected ParticleDevice(ParticleCloud cloud, JObject obj)
 		{
-			if(cloud == null)
+			if (cloud == null)
 			{
 				throw new ArgumentNullException(nameof(cloud));
 			}
@@ -46,7 +94,7 @@ namespace Particle
 
 		private String parseStringValue(JToken token)
 		{
-			if(token?.Type == JTokenType.String)
+			if (token?.Type == JTokenType.String)
 			{
 				return token.Value<String>();
 			}
@@ -55,7 +103,7 @@ namespace Particle
 
 		private DateTime? parseDateTimeValue(JToken token)
 		{
-			if(token?.Type == JTokenType.Date)
+			if (token?.Type == JTokenType.Date)
 			{
 				return token.Value<DateTime>();
 			}
@@ -65,11 +113,11 @@ namespace Particle
 
 		private int parseIntValue(JToken token)
 		{
-			if(token?.Type == JTokenType.Integer)
+			if (token?.Type == JTokenType.Integer)
 			{
 				return (int)token.Value<long>();
 			}
-			else if(token?.Type == JTokenType.Float)
+			else if (token?.Type == JTokenType.Float)
 			{
 				return (int)token.Value<double>();
 			}
@@ -79,7 +127,7 @@ namespace Particle
 
 		private bool parseBooleanValue(JToken token)
 		{
-			if(token?.Type == JTokenType.Boolean)
+			if (token?.Type == JTokenType.Boolean)
 			{
 				return token.Value<Boolean>();
 			}
@@ -88,18 +136,25 @@ namespace Particle
 
 		protected virtual void ParseVariables(JObject obj)
 		{
-			if(obj == null)
+			if (obj == null)
 			{
 				throw new ArgumentNullException(nameof(obj));
 			}
 
-			variables.Clear();
-
-			foreach(var prop in obj.Properties())
+			ParticleCloud.SyncContext.InvokeIfRequired(() =>
 			{
-				var name = prop.Name;
-				variables[name] = prop.Value?.ToString();
-			}
+				variables.Clear();
+
+				foreach (var prop in obj.Properties())
+				{
+					var variable = new Variable(this)
+					{
+						Name = prop.Name,
+						Type = prop.Value?.ToString()
+					};
+					variables.Add(variable);
+				}
+			});
 		}
 
 		protected virtual void ParseFunctions(JArray arr)
@@ -122,12 +177,12 @@ namespace Particle
 
 		protected virtual void ParseObject(JObject obj)
 		{
-			if(obj == null)
+			if (obj == null)
 			{
 				throw new ArgumentNullException(nameof(obj));
 			}
 
-			foreach(var prop in obj.Properties())
+			foreach (var prop in obj.Properties())
 			{
 				var name = prop.Name;
 				switch (name)
@@ -154,27 +209,19 @@ namespace Particle
 						Connected = parseBooleanValue(prop.Value);
 						break;
 					case "variables":
-						if(prop.Value?.Type == JTokenType.Object)
+						if (prop.Value?.Type == JTokenType.Object)
 						{
 							ParseVariables((JObject)prop.Value);
+
 						}
 						break;
 					case "functions":
-						if(prop.Value?.Type == JTokenType.Array)
+						if (prop.Value?.Type == JTokenType.Array)
 						{
 							ParseFunctions((JArray)prop.Value);
 						}
 						break;
 				}
-			}
-		}
-
-		private Dictionary<String, String> variables = new Dictionary<string, string>();
-		public IReadOnlyDictionary<String, String> Variables
-		{
-			get
-			{
-				return variables;
 			}
 		}
 
@@ -210,9 +257,9 @@ namespace Particle
 				}
 			}
 
-			if(response.StatusCode == System.Net.HttpStatusCode.OK)
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
 			{
-				if(response.Response?.Type == JTokenType.Object)
+				if (response.Response?.Type == JTokenType.Object)
 				{
 					await Task.Run(() => ParseObject((JObject)response.Response));
 					return new Result(true);

@@ -48,5 +48,28 @@ namespace Universal
 				}
 			}
 		}
+
+		private void DevicesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (e.AddedItems.Count > 0)
+			{
+				if (DevicesListView.SelectedItem != DevicesComboBox.SelectedItem)
+				{
+					DevicesComboBox.SelectedItem = DevicesListView.SelectedItem;
+				}
+			}
+		}
+
+		private void DevicesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if(e.AddedItems.Count > 0)
+			{
+				InternalFrame.Navigate(typeof(DeviceInfo), e.AddedItems[0]);
+				if(DevicesListView.SelectedItem != DevicesComboBox.SelectedItem)
+				{
+					DevicesListView.SelectedItem = DevicesComboBox.SelectedItem;
+				}
+			}
+		}
 	}
 }
