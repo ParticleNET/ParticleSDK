@@ -38,7 +38,7 @@ namespace Particle
 
 		public async Task<Result> RefreshValueAsync()
 		{
-			throw new NotImplementedException();
+			return (Result)await device.GetVariableValueAsync(this);
 		}
 	}
 }

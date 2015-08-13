@@ -8,9 +8,9 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-namespace Universal
+namespace Common.Controls
 {
-	public class AlternatingRowListView : ListView
+	public class AlternatingRowComboBox : ComboBox
 	{
 		protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
 		{
@@ -21,7 +21,7 @@ namespace Universal
 			{
 				var index = IndexFromContainer(element);
 
-				if ((index) % 2 == 1)
+				if ((index) == 1)
 				{
 					listViewItem.Background = new SolidColorBrush(Colors.White);
 				}

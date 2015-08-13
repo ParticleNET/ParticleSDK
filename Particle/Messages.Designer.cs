@@ -80,6 +80,15 @@ namespace Particle {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The passed variable must have a name.
+        /// </summary>
+        internal static string PassedVariableMustHaveAName {
+            get {
+                return ResourceManager.GetString("PassedVariableMustHaveAName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please Login Again.
         /// </summary>
         internal static string PleaseLoginAgain {

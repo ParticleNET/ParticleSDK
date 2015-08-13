@@ -96,20 +96,11 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlternatingRowComboBox.cs" />
-    <Compile Include="AlternatingRowListView.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AppSettings.cs" />
     <Compile Include="AuthenticationDialog.xaml.cs">
       <DependentUpon>AuthenticationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ComboBoxItemTemplateSelector.cs" />
-    <Compile Include="Converters\VisibilityConverter.cs" />
-    <Compile Include="Converters\VisibilityNotConverter.cs" />
-    <Compile Include="DeviceInfo.xaml.cs">
-      <DependentUpon>DeviceInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -141,10 +132,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceInfo.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -154,6 +141,10 @@
     <ProjectReference Include="..\..\Particle\Particle.csproj">
       <Project>{987b4815-eed0-4c8c-870f-15d635ce7d6c}</Project>
       <Name>Particle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StoreCommon\StoreCommon.csproj">
+      <Project>{75e23685-9605-44e8-8c72-d21b6c4468e6}</Project>
+      <Name>StoreCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

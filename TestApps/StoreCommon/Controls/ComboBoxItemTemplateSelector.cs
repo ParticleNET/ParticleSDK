@@ -7,7 +7,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-namespace Universal
+namespace Common.Controls
 {
 	public class ComboBoxItemTemplateSelector : DataTemplateSelector
 	{

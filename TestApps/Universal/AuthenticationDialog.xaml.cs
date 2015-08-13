@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Win8;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -23,28 +22,17 @@ namespace Universal
 		public AuthenticationDialog()
 		{
 			this.InitializeComponent();
-			DataContext = AppSettings.Current;
 		}
 
 		private async void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
-			ErrorContainer.Visibility = Visibility.Collapsed;
 			var deferral = args.GetDeferral();
-			LoggingInContainer.Visibility = Visibility.Visible;
-			var result = await App.Cloud.LoginWithUserAsync(AppSettings.Current.Username, AppSettings.Current.Password);
-			if (!result.Success)
+			var results = await AuthControl.AuthenticateAsync(App.Cloud);
+			if(!results)
 			{
 				args.Cancel = true;
-				ErrorOutput.Text = result.Error;
-				ErrorDescriptionOutput.Text = result.ErrorDescription;
-				ErrorContainer.Visibility = Visibility.Visible;
 			}
-			LoggingInContainer.Visibility = Visibility.Collapsed;
 			deferral.Complete();
-		}
-
-		private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-		{
 		}
 	}
 }

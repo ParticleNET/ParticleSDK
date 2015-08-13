@@ -6,23 +6,12 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
+	xmlns:controls="using:Common.Controls"
 	Title="Authenticate"
 	PrimaryButtonText="Login"
-	PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-	SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+	PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
 
 	<StackPanel>
-		<TextBlock Text="Username" Margin="5" />
-		<TextBox Text="{Binding Username, Mode=TwoWay}" Margin="5" InputScope="EmailSmtpAddress" />
-		<TextBlock Text="Password" Margin="5" />
-		<PasswordBox Password="{Binding Password, Mode=TwoWay}" Margin="5" />
-		<StackPanel x:Name="LoggingInContainer" Orientation="Horizontal" Visibility="Collapsed">
-			<TextBlock Text="Logging In" Margin="5" />
-			<ProgressRing IsActive="True" Margin="5" />
-		</StackPanel>
-		<StackPanel x:Name="ErrorContainer" Visibility="Collapsed">
-			<TextBlock x:Name="ErrorOutput" Text="" Margin="5" />
-			<TextBlock x:Name="ErrorDescriptionOutput" Margin="5" />
-		</StackPanel>
+		<controls:AuthenticationControl x:Name="AuthControl" />
 	</StackPanel>
 </ContentDialog>

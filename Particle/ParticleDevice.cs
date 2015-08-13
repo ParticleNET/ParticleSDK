@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Particle
@@ -141,18 +140,34 @@ namespace Particle
 				throw new ArgumentNullException(nameof(obj));
 			}
 
-			ParticleCloud.SyncContext.InvokeIfRequired(() =>
-			{
-				variables.Clear();
+			var list = new List<Variable>();
 
-				foreach (var prop in obj.Properties())
+			foreach (var prop in obj.Properties())
+			{
+				var first = variables.FirstOrDefault(i => String.Compare(i.Name, prop.Name) == 0);
+				if(first == null)
 				{
-					var variable = new Variable(this)
+					first = new Variable(this)
 					{
 						Name = prop.Name,
 						Type = prop.Value?.ToString()
 					};
-					variables.Add(variable);
+				}
+				else
+				{
+					first.Type = prop.Value?.ToString();
+				}
+
+				list.Add(first);
+			}
+
+			ParticleCloud.SyncContext.InvokeIfRequired(() =>
+			{
+				variables.Clear();
+
+				foreach(var item in list)
+				{
+					variables.Add(item);
 				}
 			});
 		}
@@ -164,15 +179,18 @@ namespace Particle
 				throw new ArgumentNullException(nameof(arr));
 			}
 
-			functions.Clear();
-
-			foreach (var i in arr)
+			ParticleCloud.SyncContext.InvokeIfRequired(() =>
 			{
-				if (i.Type == JTokenType.String)
+				functions.Clear();
+
+				foreach (var i in arr)
 				{
-					functions.Add(i.Value<String>());
+					if (i.Type == JTokenType.String)
+					{
+						functions.Add(i.Value<String>());
+					}
 				}
-			}
+			});
 		}
 
 		protected virtual void ParseObject(JObject obj)
@@ -188,25 +206,46 @@ namespace Particle
 				switch (name)
 				{
 					case "id":
-						Id = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Id = parseStringValue(prop.Value);
+						});
 						break;
 					case "name":
-						Name = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Name = parseStringValue(prop.Value);
+						});
 						break;
 					case "last_app":
-						LastApp = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							LastApp = parseStringValue(prop.Value);
+						});
 						break;
 					case "last_ip_address":
-						LastIPAddress = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							LastIPAddress = parseStringValue(prop.Value);
+						});
 						break;
 					case "last_heard":
-						LastHeard = parseDateTimeValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							LastHeard = parseDateTimeValue(prop.Value);
+						});
 						break;
 					case "product_id":
-						DeviceType = (ParticleDeviceType)parseIntValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							DeviceType = (ParticleDeviceType)parseIntValue(prop.Value);
+						});
 						break;
 					case "connected":
-						Connected = parseBooleanValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Connected = parseBooleanValue(prop.Value);
+						});
 						break;
 					case "variables":
 						if (prop.Value?.Type == JTokenType.Object)
@@ -225,7 +264,7 @@ namespace Particle
 			}
 		}
 
-		private List<String> functions = new List<string>();
+		private ObservableCollection<String> functions = new ObservableCollection<string>();
 		public IReadOnlyList<String> Functions
 		{
 			get
@@ -234,14 +273,103 @@ namespace Particle
 			}
 		}
 
-		public async Task<Result<T>> GetVariableValueAsync<T>(String variableName)
+		public async Task<Result<Variable>> GetVariableValueAsync(String variable)
 		{
-			throw new NotImplementedException();
+			if(variable == null)
+			{
+				throw new ArgumentNullException(nameof(variable));
+			}
+
+			Variable vari;
+			vari = await Task.Run(() => variables.FirstOrDefault(i => String.Compare(i.Name, variable) == 0));
+			if (vari == null)
+			{
+				vari = new Variable(this);
+				vari.Name = variable;
+			}
+
+			return await GetVariableValueAsync(vari);
 		}
 
-		public async Task<Result<int>> CallFunctionAsync(String functionName, params String[] args)
+		public async Task<Result<Variable>> GetVariableValueAsync(Variable variable)
 		{
-			throw new NotImplementedException();
+			
+			if(variable == null)
+			{
+				throw new ArgumentNullException(nameof(variable));
+			}
+
+			if (String.IsNullOrWhiteSpace(variable.Name))
+			{
+				throw new ArgumentException(Messages.PassedVariableMustHaveAName, nameof(variable));
+			}
+
+			var svariable = await Task.Run(() => variables.FirstOrDefault(i => i == variable));
+
+			if(svariable == null)
+			{
+				ParticleCloud.SyncContext.InvokeIfRequired(() =>
+				{
+					variables.Add(variable);
+				});
+			}
+
+			var response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await cloud.RefreshTokenAsync();
+				response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
+				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				{
+					return response.AsResult<Variable>();
+				}
+			}
+
+			if(response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var tresult = response.Response.SelectToken("result");
+				variable.Value = tresult.Value<Object>().ToString();
+				/*
+			"name": "temperature",
+  "result": 46,
+  "coreInfo": {
+	"name": "weatherman",
+	"deviceID": "0123456789abcdef01234567",
+	"connected": true,
+	"last_handshake_at": "2015-07-17T22:28:40.907Z",
+	"last_app": ""
+  }*/
+
+				return new Result<Variable>
+				{
+					Success = true,
+					Data = variable
+				};
+			}
+			else
+			{
+				return response.AsResult<Variable>();
+			}
+		}
+
+		public async Task<Result<int>> CallFunctionAsync(String functionName, String arg)
+		{
+			if(String.IsNullOrWhiteSpace(functionName))
+			{
+				throw new ArgumentNullException(nameof(functionName));
+			}
+
+			var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
+
+			if(response.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var returnValue = response.Response.SelectToken("return_value");
+				return new Result<int>(true, (int)returnValue.Value<long>());
+			}
+			else
+			{
+				return response.AsResult<int>();
+			}
 		}
 
 		public async Task<Result> RefreshAsync()
@@ -321,18 +449,18 @@ last_heard: "2015-07-11T05:25:09.960Z"
 product_id: 6
 connected: true*/
 
-		/*
-id: "390032000647343232363230"
-name: "Proto"
-connected: true
-variables: {
-temp: "double"
-}-
-functions: [1]
-0:  "led"
--
-cc3000_patch_version: null
-product_id: 6
-last_heard: "2015-07-11T05:32:56.614Z"*/
+			/*
+	id: "390032000647343232363230"
+	name: "Proto"
+	connected: true
+	variables: {
+	temp: "double"
+	}-
+	functions: [1]
+	0:  "led"
+	-
+	cc3000_patch_version: null
+	product_id: 6
+	last_heard: "2015-07-11T05:32:56.614Z"*/
+		}
 	}
-}

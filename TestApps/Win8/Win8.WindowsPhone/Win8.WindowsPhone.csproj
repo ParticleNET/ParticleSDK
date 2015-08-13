@@ -85,6 +85,10 @@
       <Project>{987b4815-eed0-4c8c-870f-15d635ce7d6c}</Project>
       <Name>Particle</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\StoreCommon\StoreCommon.csproj">
+      <Project>{75e23685-9605-44e8-8c72-d21b6c4468e6}</Project>
+      <Name>StoreCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

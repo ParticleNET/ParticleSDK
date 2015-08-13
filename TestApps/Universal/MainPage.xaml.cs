@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using Win8;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Popups;
@@ -64,7 +63,7 @@ namespace Universal
 		{
 			if(e.AddedItems.Count > 0)
 			{
-				InternalFrame.Navigate(typeof(DeviceInfo), e.AddedItems[0]);
+				InternalFrame.Navigate(typeof(Common.Controls.DeviceInfo), e.AddedItems[0]);
 				if(DevicesListView.SelectedItem != DevicesComboBox.SelectedItem)
 				{
 					DevicesListView.SelectedItem = DevicesComboBox.SelectedItem;

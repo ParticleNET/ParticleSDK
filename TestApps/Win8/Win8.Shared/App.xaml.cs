@@ -57,6 +57,7 @@ namespace Win8
 #endif
 
 			Frame rootFrame = Window.Current.Content as Frame;
+			ParticleCloud.SyncContext = System.Threading.SynchronizationContext.Current;
 
 			// Do not repeat app initialization when the Window already has content,
 			// just ensure that the window is active

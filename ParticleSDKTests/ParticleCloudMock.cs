@@ -41,7 +41,7 @@ namespace ParticleSDKTests
 			{
 				if (RequestCallBack != null)
 				{
-					return RequestCallBack("POST", method, null);
+					return RequestCallBack("POST", method, arguments);
 				}
 
 				throw new NullReferenceException("Please provide a RequestCallBack for this test");

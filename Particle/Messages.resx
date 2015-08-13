@@ -135,4 +135,7 @@
   <data name="YouMustLoginBeforeRefreshingToken" xml:space="preserve">
     <value>You must login before we can refresh the token</value>
   </data>
+  <data name="PassedVariableMustHaveAName" xml:space="preserve">
+    <value>The passed variable must have a name</value>
+  </data>
 </root>

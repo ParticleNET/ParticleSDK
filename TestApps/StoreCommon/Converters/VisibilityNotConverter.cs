@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace Universal.Converters
+namespace Common.Converters
 {
-	public class VisibilityNotConverter : IValueConverter
+	public sealed class VisibilityNotConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{

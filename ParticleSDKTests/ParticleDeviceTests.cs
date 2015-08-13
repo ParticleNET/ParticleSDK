@@ -123,5 +123,103 @@ namespace ParticleSDKTests
 			Assert.AreEqual("led", functions[0]);
 			Assert.AreEqual("led2", functions[1]);
 		}
+
+		[TestMethod]
+		public async Task GetVariableValueAsyncTest()
+		{
+			ParticleCloudMock cloud = new ParticleCloudMock();
+			cloud.RequestCallBack = (a, b, c) =>
+			{
+				Assert.AreEqual("GET", a);
+				Assert.AreEqual("devices/3/temp", b);
+				return new RequestResponse
+				{
+					StatusCode = System.Net.HttpStatusCode.OK,
+					Response = JToken.Parse(@"{'name': 'temp',
+  'result': 300,
+  'coreInfo': {
+						'name': 'weatherman',
+						'deviceID': '0123456789abcdef01234567',
+						'connected': true,
+						'last_handshake_at': '2015-07-17T22:28:40.907Z',
+						'last_app': ''
+					}}")
+				};
+			};
+
+			var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'variables':{'temp':'int'}}"));
+
+			var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.GetVariableValueAsync((String)null).GetAwaiter().GetResult(); });
+			Assert.AreEqual("variable", ex.ParamName);
+			ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.GetVariableValueAsync((Variable)null).GetAwaiter().GetResult(); });
+			Assert.AreEqual("variable", ex.ParamName);
+			
+			var results = await p.GetVariableValueAsync("temp");
+			Assert.IsTrue(results.Success);
+			Assert.IsNotNull(results.Data);
+			var variable = results.Data;
+			Assert.AreEqual("temp", variable.Name);
+			Assert.AreEqual("300", variable.Value);
+
+			cloud.RequestCallBack = (a, b, c) =>
+			{
+				Assert.AreEqual("GET", a);
+				Assert.AreEqual("devices/3/temp", b);
+				return new RequestResponse
+				{
+					StatusCode = System.Net.HttpStatusCode.OK,
+					Response = JToken.Parse(@"{'name': 'temp',
+  'result': 23,
+  'coreInfo': {
+						'name': 'weatherman',
+						'deviceID': '0123456789abcdef01234567',
+						'connected': true,
+						'last_handshake_at': '2015-07-17T22:28:40.907Z',
+						'last_app': ''
+					}}")
+				};
+			};
+
+			results = await p.GetVariableValueAsync(variable);
+			Assert.IsTrue(results.Success);
+			Assert.IsNotNull(results.Data);
+			variable = results.Data;
+			Assert.AreEqual("temp", variable.Name);
+			Assert.AreEqual("23", variable.Value);
+		}
+
+		[TestMethod]
+		public async Task CallFunctionAsyncTest()
+		{
+			ParticleCloudMock cloud = new ParticleCloudMock();
+			cloud.RequestCallBack = (a, b, c) =>
+			{
+				Assert.AreEqual("POST", a);
+				Assert.AreEqual("devices/3/led", b);
+				Assert.AreEqual(1, c.Count());
+				var first = c.FirstOrDefault();
+				Assert.IsNotNull(first);
+				Assert.AreEqual("arg", first.Key);
+				Assert.AreEqual("on", first.Value);
+				return new RequestResponse
+				{
+					StatusCode = System.Net.HttpStatusCode.OK,
+					Response = JToken.Parse(@"{
+  'id': '3',
+  'name': 'led',
+  'last_app': '',
+  'connected': true,
+  'return_value': 1
+}")
+				};
+			};
+
+			var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'functions':['led']}"));
+			var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
+			Assert.AreEqual("functionName", exc.ParamName);
+			var result = await p.CallFunctionAsync("led", "on");
+			Assert.IsTrue(result.Success);
+			Assert.AreEqual(1, result.Data);
+		}
 	}
 }

@@ -108,8 +108,18 @@
       <Project>{987b4815-eed0-4c8c-870f-15d635ce7d6c}</Project>
       <Name>Particle</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\StoreCommon\StoreCommon.csproj">
+      <Project>{75e23685-9605-44e8-8c72-d21b6c4468e6}</Project>
+      <Name>StoreCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthenticationPopup.xaml.cs">
+      <DependentUpon>AuthenticationPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -134,6 +144,16 @@
       <HintPath>..\..\..\packages\Microsoft.Net.Http.2.2.29\lib\win8\System.Net.Http.Primitives.dll</HintPath>
       <Private>True</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="AuthenticationPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

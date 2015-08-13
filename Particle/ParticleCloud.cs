@@ -80,6 +80,18 @@ namespace Particle
 			return rr;
 		}
 
+		public async Task<RequestResponse> MakeGetRequestWithAuthTestAsync(String method)
+		{
+			var result = await MakeGetRequestAsync(method);
+			if(result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				result = await MakeGetRequestAsync(method);
+			}
+
+			return result;
+		}
+
 		public virtual async Task<RequestResponse> MakePostRequestAsync(String method, params KeyValuePair<String, String>[] arguments)
 		{
 			if (String.IsNullOrWhiteSpace(method))
@@ -111,6 +123,18 @@ namespace Particle
 			rr.Response = await Task.Run(() => JToken.Parse(str));
 
 			return rr;
+		}
+
+		public virtual async Task<RequestResponse> MakePostRequestWithAuthTestAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			var response = await MakePostRequestAsync(method, arguments);
+			if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				response = await MakePostRequestAsync(method, arguments);
+			}
+
+			return response;
 		}
 
 		public Task<Result> RefreshTokenAsync()
