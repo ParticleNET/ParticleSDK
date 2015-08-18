@@ -1,0 +1,38 @@
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:converters="using:Common.Converters"
+	xmlns:controls="using:Common.Controls"
+	xmlns:local="using:Common">
+	<converters:VisibilityConverter x:Key="VisibilityConverter" />
+	<converters:VisibilityNotConverter x:Key="VisibilityNotConverter" />
+	<DataTemplate x:Key="DeviceSelectLong">
+		<Grid HorizontalAlignment="Stretch">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition />
+				<RowDefinition />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<TextBlock Text="Id:" Margin="5" />
+			<TextBlock Text="{Binding Id}" Margin="5" Grid.Column="1" />
+			<TextBlock Text="Name:" Margin="5" Grid.Row="1" />
+			<TextBlock Text="{Binding Name}" Margin="5" Grid.Row="1" Grid.Column="1" />
+			<TextBlock Text="Connected" Margin="5" Grid.Row="2" Grid.ColumnSpan="2" Visibility="{Binding Connected, Converter={StaticResource ResourceKey=VisibilityConverter}}" Foreground="#FF0B610B" />
+			<TextBlock Text="Not Connected" Margin="5" Grid.Row="2" Grid.ColumnSpan="2" Foreground="#FFFF0000" Visibility="{Binding Connected, Converter={StaticResource ResourceKey=VisibilityNotConverter}}" />
+		</Grid>
+	</DataTemplate>
+	<DataTemplate x:Key="DeviceSelectShort">
+		<StackPanel Orientation="Horizontal">
+			<TextBlock Text="{Binding Name}" />
+			<TextBlock Text="(" />
+			<TextBlock Text="{Binding Id}" />
+			<TextBlock Text=")" />
+		</StackPanel>
+	</DataTemplate>
+	<controls:ComboBoxItemTemplateSelector x:Key="ComboTemplateSelector" DropDownTemplate="{StaticResource ResourceKey=DeviceSelectShort}" SelectedTemplate="{StaticResource DeviceSelectLong}">
+	</controls:ComboBoxItemTemplateSelector>
+</ResourceDictionary>
