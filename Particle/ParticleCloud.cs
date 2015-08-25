@@ -248,16 +248,18 @@ namespace Particle
 				Error = postResults.StatusCode.ToString()
 			};
 		}
+
 		/// <summary>
-		/// Sign up with new account credentials to Spark cloud
+		/// Sign up with new account credentials to Particle cloud
 		/// </summary>
 		/// <param name="username">Required user name, must be a valid email address</param>
 		/// <param name="password">Required password</param>
 		/// <returns></returns>
-		//public async Task<SignupResults> SignupWithUserAsync(String username, String password)
-		//{
-
-		//}
+		public async Task<Result> SignupWithUserAsync(String username, String password)
+		{
+			// /v1/users/signUp
+			return null;
+		}
 
 		/// <summary>
 		/// Logs the user out locally
