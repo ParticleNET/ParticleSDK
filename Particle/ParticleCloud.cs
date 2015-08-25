@@ -27,14 +27,26 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// Represents the connection to the particle cloud.
+	/// </summary>
 	public class ParticleCloud : ParticleBase, IDisposable
 	{
 		private HttpClient client;
 		private Uri baseUri;
 		private AuthenticationResults authResults;
 
+		/// <summary>
+		/// Set this to the UI threads SynchronizationContext
+		/// Any operation that may update the ui gets sent through the SyncContext if its null the operation is executed on the current thread
+		/// 
+		/// i.e. for Universal apps set this to ParticleCloud.SyncContext = System.Threading.SynchronizationContext.Current; in the App.xaml.cs inside the OnLaunch function
+		/// </summary>
 		public static SynchronizationContext SyncContext { get; set; }
 
+		/// <summary>
+		/// True if the user is authenticated into the cloud
+		/// </summary>
 		public bool IsAuthenticated
 		{
 			get
@@ -43,8 +55,11 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
+		/// </summary>
 		public ParticleCloud()
-			: this(new Uri("https://api.particle.io/v1/"))
+					: this(new Uri("https://api.particle.io/v1/"))
 		{
 
 		}
