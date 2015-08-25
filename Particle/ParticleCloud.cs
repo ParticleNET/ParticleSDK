@@ -258,6 +258,9 @@ namespace Particle
 		public async Task<Result> SignupWithUserAsync(String username, String password)
 		{
 			// /v1/users/signUp
+			// Post:
+			// username
+			// password
 			return null;
 		}
 
