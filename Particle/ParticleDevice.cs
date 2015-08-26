@@ -530,12 +530,6 @@ namespace Particle
 			throw new NotImplementedException();
 		}*/
 
-		// this method signature should probably change and its return type will change
-		/*public async Task<Result> ComplileFilesAsync(IDictionary<String, byte[]> files)
-		{
-			throw new NotImplementedException();
-		}*/
-
 		/*id: "390032000647343232363230"
 name: "Proto"
 last_app: null
