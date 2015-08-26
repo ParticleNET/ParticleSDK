@@ -21,14 +21,26 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// There was a problem authenticating to the cloud
+	/// </summary>
 	public class ParticleAuthenticationExeption : ParticleException
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleAuthenticationExeption"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
 		public ParticleAuthenticationExeption(String message)
 			: base(message)
 		{
 
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleAuthenticationExeption"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <param name="innerException">The inner exception.</param>
 		public ParticleAuthenticationExeption(String message, Exception innerException) : base(message, innerException) { }
 	}
 }

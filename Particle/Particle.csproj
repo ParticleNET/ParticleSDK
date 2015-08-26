@@ -27,7 +27,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Particle.XML</DocumentationFile>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,7 +39,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="LoginResult.cs" />
     <Compile Include="Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -56,7 +54,6 @@
     <Compile Include="RequestResponse.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Results\AuthenticationResults.cs" />
-    <Compile Include="Results\ErrorResult.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup>

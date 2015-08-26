@@ -7,8 +7,16 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// Extensions the ParicleSDK uses
+	/// </summary>
 	public static class Extensions
 	{
+		/// <summary>
+		/// Runs the provided <paramref name="action"/> on the SynchronizationContext if one is provided otherwise runs the action on the current thread
+		/// </summary>
+		/// <param name="context">The SynchronizationContext.</param>
+		/// <param name="action">The action to run</param>
 		public static void InvokeIfRequired(this SynchronizationContext context, Action action)
 		{
 			if(context == null)
