@@ -27,14 +27,26 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// Represents the connection to the particle cloud.
+	/// </summary>
 	public class ParticleCloud : ParticleBase, IDisposable
 	{
 		private HttpClient client;
 		private Uri baseUri;
 		private AuthenticationResults authResults;
 
+		/// <summary>
+		/// Set this to the UI threads SynchronizationContext
+		/// Any operation that may update the UI gets sent through the SyncContext if its null the operation is executed on the current thread
+		/// 
+		/// i.e. for Universal App set this to ParticleCloud.SyncContext = System.Threading.SynchronizationContext.Current; in the App.xaml.cs inside the OnLaunch function
+		/// </summary>
 		public static SynchronizationContext SyncContext { get; set; }
 
+		/// <summary>
+		/// True if the user is authenticated into the cloud
+		/// </summary>
 		public bool IsAuthenticated
 		{
 			get
@@ -43,12 +55,19 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
+		/// </summary>
 		public ParticleCloud()
-			: this(new Uri("https://api.particle.io/v1/"))
+					: this(new Uri("https://api.particle.io/v1/"))
 		{
 
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleCloud" /> class.
+		/// </summary>
+		/// <param name="baseUri">The url to the particle sdk i.e. https://api.particle.io/v1/ </param>
 		public ParticleCloud(Uri baseUri)
 		{
 			this.baseUri = baseUri;
@@ -56,6 +75,11 @@ namespace Particle
 			client.BaseAddress = baseUri;
 		}
 
+		/// <summary>
+		/// Makes the get request asynchronous to the cloud api
+		/// </summary>
+		/// <param name="method">The method to call i.e. devices</param>
+		/// <returns>The results of the request.</returns>
 		public virtual async Task<RequestResponse> MakeGetRequestAsync(String method)
 		{
 			if (String.IsNullOrWhiteSpace(method))
@@ -80,10 +104,15 @@ namespace Particle
 			return rr;
 		}
 
+		/// <summary>
+		/// Calls <seealso cref="MakeGetRequestAsync(string)"/> and if it returns a status code of Unauthorized try s to refresh the token and makes the request again
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <returns>The results from the request</returns>
 		public async Task<RequestResponse> MakeGetRequestWithAuthTestAsync(String method)
 		{
 			var result = await MakeGetRequestAsync(method);
-			if(result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
 				result = await MakeGetRequestAsync(method);
@@ -92,19 +121,25 @@ namespace Particle
 			return result;
 		}
 
+		/// <summary>
+		/// Makes the post request asynchronous to the particle cloud
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <param name="arguments">The arguments to pass during the call</param>
+		/// <returns>The results of the request</returns>
 		public virtual async Task<RequestResponse> MakePostRequestAsync(String method, params KeyValuePair<String, String>[] arguments)
 		{
 			if (String.IsNullOrWhiteSpace(method))
 			{
 				throw new ArgumentNullException(nameof(method));
 			}
-			
-			if(authResults == null)
+
+			if (authResults == null)
 			{
 				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
 			}
 
-			
+
 			client.DefaultRequestHeaders.Clear();
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 
@@ -125,10 +160,16 @@ namespace Particle
 			return rr;
 		}
 
+		/// <summary>
+		/// Calls <seealso cref="MakePostRequestAsync(string, KeyValuePair{string, string}[])"/> and if it returns a status code of Unauthorized try s to refresh the token and makes the request again
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <param name="arguments">The arguments to pass during the call</param>
+		/// <returns>The results from the request</returns>
 		public virtual async Task<RequestResponse> MakePostRequestWithAuthTestAsync(String method, params KeyValuePair<String, String>[] arguments)
 		{
 			var response = await MakePostRequestAsync(method, arguments);
-			if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
 				response = await MakePostRequestAsync(method, arguments);
@@ -137,6 +178,10 @@ namespace Particle
 			return response;
 		}
 
+		/// <summary>
+		/// Refreshes the access token asynchronous.
+		/// </summary>
+		/// <returns>The results of the request to refresh the token</returns>
 		public Task<Result> RefreshTokenAsync()
 		{
 			if (authResults == null)
@@ -190,8 +235,9 @@ namespace Particle
 		/// <summary>
 		/// Logs into ParticleCloud with the given username and password
 		/// </summary>
-		/// <param name="username">Must be a valid email address</param>
-		/// <param name="password">The password for the user</param>
+		/// <param name="username">The Particle account username</param>
+		/// <param name="password">The Particle account password</param>
+		/// <param name="expiresIn">How many seconds the token will be valid for. 0 means forever. Short lived tokens are better for security.</param>
 		/// <returns>Result if Result.Success == true the user is logged in if its false the user is not logged in and ErrorMessage will contain the error from the server</returns>
 		public async Task<Result> LoginWithUserAsync(String username, String password, int expiresIn = 3600)
 		{
@@ -248,12 +294,12 @@ namespace Particle
 				Error = postResults.StatusCode.ToString()
 			};
 		}
-		/// <summary>
-		/// Sign up with new account credentials to Spark cloud
-		/// </summary>
-		/// <param name="username">Required user name, must be a valid email address</param>
-		/// <param name="password">Required password</param>
-		/// <returns></returns>
+		// <summary>
+		// Sign up with new account credentials to Spark cloud
+		// </summary>
+		// <param name="username">Required user name, must be a valid email address</param>
+		// <param name="password">Required password</param>
+		// <returns></returns>
 		//public async Task<SignupResults> SignupWithUserAsync(String username, String password)
 		//{
 
@@ -268,7 +314,7 @@ namespace Particle
 		}
 
 		/// <summary>
-		/// Get the list of devices the user has claimed
+		/// Get the list of devices the user has access to
 		/// </summary>
 		/// <returns></returns>
 		public async Task<Result<List<ParticleDevice>>> GetDevicesAsync()
@@ -304,49 +350,53 @@ namespace Particle
 		}
 
 		/// <summary>
-		/// Gets the device with the id equal to <paramref name="deviceId"/>
-		/// or returns null if its not found.
+		/// Releases unmanaged and - optionally - managed resources mainly the underlining HttpClient
 		/// </summary>
-		/// <param name="deviceId">The id of the device to get</param>
-		/// <returns>The device</returns>
+		public void Dispose()
+		{
+			client.Dispose();
+		}
+
+		// <summary>
+		// Gets the device with the id equal to <paramref name="deviceId"/>
+		// or returns null if its not found.
+		// </summary>
+		// <param name="deviceId">The id of the device to get</param>
+		// <returns>The device</returns>
 		//public async Task<ParticleDevice> GetDeviceAsync(String deviceId)
 		//{
 
 		//}
 
-		/// <summary>
-		/// Not available Yet
-		/// </summary>
-		/// <param name="eventName"></param>
-		/// <param name="data"></param>
-		/// <returns></returns>
+		// <summary>
+		// Not available Yet
+		// </summary>
+		// <param name="eventName"></param>
+		// <param name="data"></param>
+		// <returns></returns>
 		//public async Task PublishEvent(String eventName, System.IO.Stream data)
 		//{
 
 		//}
 
-		/// <summary>
-		/// Claims the specified device for the logged in user
-		/// </summary>
-		/// <param name="deviceId">The id of the new device</param>
-		/// <returns></returns>
+		// <summary>
+		// Claims the specified device for the logged in user
+		// </summary>
+		// <param name="deviceId">The id of the new device</param>
+		// <returns></returns>
 		//public async Task<ClaimResult> ClaimDeviceAsync(String deviceId)
 		//{
 
 		//}
 
-		/// <summary>
-		/// Get a short-lived claiming token for transmitting to soon-to-be-claimed device in soft AP setup process
-		/// </summary>
-		/// <returns></returns>
+		// <summary>
+		// Get a short-lived claiming token for transmitting to soon-to-be-claimed device in soft AP setup process
+		// </summary>
 		//public async Task<ClaimCodeResult> GenerateClaimCodeAsync()
 		//{
 
 		//}
-		
-		public void Dispose()
-		{
-			client.Dispose();
-		}
+
+
 	}
 }

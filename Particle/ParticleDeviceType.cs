@@ -21,9 +21,22 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// The type of particle devices
+	/// </summary>
 	public enum ParticleDeviceType
 	{
+		/// <summary>
+		/// The Core
+		/// </summary>
 		SparkDeviceTypeCore = 0,
-		SparkDeviceTypePhoton = 6
+		/// <summary>
+		/// The Photon
+		/// </summary>
+		SparkDeviceTypePhoton = 6,
+		/*
+		Possible devices for the Electron
+		SparkDeviceTypeElectron2G,
+		SparkDeviceTypeElectron3G*/
 	}
 }
