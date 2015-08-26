@@ -39,7 +39,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="LoginResult.cs" />
     <Compile Include="Messages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -55,7 +54,6 @@
     <Compile Include="RequestResponse.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Results\AuthenticationResults.cs" />
-    <Compile Include="Results\ErrorResult.cs" />
     <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup>

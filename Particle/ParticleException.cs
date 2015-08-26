@@ -23,20 +23,52 @@ using Newtonsoft.Json;
 
 namespace Particle
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ParticleException : Exception
 	{
+		/// <summary>
+		/// Gets or sets the status.
+		/// </summary>
+		/// <value>
+		/// The status.
+		/// </value>
 		public HttpStatusCode Status{ get; set; }
+		/// <summary>
+		/// Gets or sets the error.
+		/// </summary>
+		/// <value>
+		/// The error.
+		/// </value>
 		[JsonProperty("error")]
 		public String Error { get; set; }
+		/// <summary>
+		/// Gets or sets the error description.
+		/// </summary>
+		/// <value>
+		/// The error description.
+		/// </value>
 		[JsonProperty("error_description")]
 		public String ErrorDescription { get; set; }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleException"/> class.
+		/// </summary>
+		/// <param name="message">The message that describes the error.</param>
 		public ParticleException(String message)
 			: base(message)
 		{
 
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleException"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <param name="code">The code.</param>
+		/// <param name="error">The error.</param>
+		/// <param name="errorDescription">The error description.</param>
 		public ParticleException(String message, HttpStatusCode code, String error, String errorDescription)
 			: base(message)
 		{
@@ -45,6 +77,11 @@ namespace Particle
 			this.ErrorDescription = errorDescription;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleException"/> class.
+		/// </summary>
+		/// <param name="message">The error message that explains the reason for the exception.</param>
+		/// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
 		public ParticleException(String message, Exception innerException)
 			: base(message, innerException)
 		{
