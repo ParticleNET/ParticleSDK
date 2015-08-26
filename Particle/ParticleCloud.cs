@@ -294,12 +294,12 @@ namespace Particle
 				Error = postResults.StatusCode.ToString()
 			};
 		}
-		/// <summary>
-		/// Sign up with new account credentials to Spark cloud
-		/// </summary>
-		/// <param name="username">Required user name, must be a valid email address</param>
-		/// <param name="password">Required password</param>
-		/// <returns></returns>
+		// <summary>
+		// Sign up with new account credentials to Spark cloud
+		// </summary>
+		// <param name="username">Required user name, must be a valid email address</param>
+		// <param name="password">Required password</param>
+		// <returns></returns>
 		//public async Task<SignupResults> SignupWithUserAsync(String username, String password)
 		//{
 
@@ -357,41 +357,41 @@ namespace Particle
 			client.Dispose();
 		}
 
-		/// <summary>
-		/// Gets the device with the id equal to <paramref name="deviceId"/>
-		/// or returns null if its not found.
-		/// </summary>
-		/// <param name="deviceId">The id of the device to get</param>
-		/// <returns>The device</returns>
+		// <summary>
+		// Gets the device with the id equal to <paramref name="deviceId"/>
+		// or returns null if its not found.
+		// </summary>
+		// <param name="deviceId">The id of the device to get</param>
+		// <returns>The device</returns>
 		//public async Task<ParticleDevice> GetDeviceAsync(String deviceId)
 		//{
 
 		//}
 
-		/// <summary>
-		/// Not available Yet
-		/// </summary>
-		/// <param name="eventName"></param>
-		/// <param name="data"></param>
-		/// <returns></returns>
+		// <summary>
+		// Not available Yet
+		// </summary>
+		// <param name="eventName"></param>
+		// <param name="data"></param>
+		// <returns></returns>
 		//public async Task PublishEvent(String eventName, System.IO.Stream data)
 		//{
 
 		//}
 
-		/// <summary>
-		/// Claims the specified device for the logged in user
-		/// </summary>
-		/// <param name="deviceId">The id of the new device</param>
-		/// <returns></returns>
+		// <summary>
+		// Claims the specified device for the logged in user
+		// </summary>
+		// <param name="deviceId">The id of the new device</param>
+		// <returns></returns>
 		//public async Task<ClaimResult> ClaimDeviceAsync(String deviceId)
 		//{
 
 		//}
 
-		/// <summary>
-		/// Get a short-lived claiming token for transmitting to soon-to-be-claimed device in soft AP setup process
-		/// </summary>
+		// <summary>
+		// Get a short-lived claiming token for transmitting to soon-to-be-claimed device in soft AP setup process
+		// </summary>
 		//public async Task<ClaimCodeResult> GenerateClaimCodeAsync()
 		//{
 
