@@ -70,6 +70,16 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Converts this response object to a <see cref="UserResult"/> object.
+		/// </summary>
+		/// <returns></returns>
+		public UserResult AsUserResult()
+		{
+			var result = Response.ToObject<UserResult>();
+			return result;
+		}
+
+		/// <summary>
 		/// Converts the JSon response to a ParticleException
 		/// </summary>
 		/// <param name="message">The message.</param>

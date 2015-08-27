@@ -133,13 +133,13 @@ namespace Particle
 			{
 				throw new ArgumentNullException(nameof(method));
 			}
-			
+
 			if (authResults == null)
 			{
 				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
 			}
 
-			
+
 			client.DefaultRequestHeaders.Clear();
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 
@@ -312,32 +312,42 @@ namespace Particle
 				throw new ArgumentNullException(nameof(password));
 			}
 
-			client.DefaultRequestHeaders.Clear();
-
 			var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
-			
-			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+
+			if (result.StatusCode == System.Net.HttpStatusCode.OK)
 			{
-				var createResult = result.Response.ToObject<CreateUserResult>();
-				if (createResult.Ok)
-				{
-					return new Result(true);
-				}
-				else
-				{
-					var e = new Result(false);
-					if (createResult.Errors != null && createResult.Errors.Length > 0)
-					{
-						e.Error = "Sign up error";
-						e.ErrorDescription = createResult.Errors[0];
-					}
-					return e;
-				}
+				var createResult = result.AsUserResult();
+				return createResult.AsResult();
 			}
 			else
 			{
 				return result.AsResult();
 			}
+		}
+
+		/// <summary>
+		/// Requests the password be reset.
+		/// </summary>
+		/// <param name="email">The email.</param>
+		/// <returns></returns>
+		public async Task<Result<String>> RequestPasswordResetAsync(String email)
+		{
+			if (String.IsNullOrWhiteSpace(email))
+			{
+				throw new ArgumentNullException(nameof(email));
+			}
+
+			var result = await MakePostRequestAsync("user/password-reset", new KeyValuePair<string, string>("username", email));
+
+			if(result.StatusCode == System.Net.HttpStatusCode.OK || result.StatusCode == System.Net.HttpStatusCode.NotFound)
+			{
+				return result.AsUserResult().AsResult();
+			}
+			else
+			{
+				return result.AsResult<String>();
+			}
+
 		}
 
 		/// <summary>
@@ -355,14 +365,14 @@ namespace Particle
 		public async Task<Result<List<ParticleDevice>>> GetDevicesAsync()
 		{
 			var response = await MakeGetRequestAsync("devices");
-			if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
-				 response = await MakeGetRequestAsync("devices");
-				 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-				 {
+				response = await MakeGetRequestAsync("devices");
+				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				{
 					return response.AsResult<List<ParticleDevice>>();
-				 }
+				}
 			}
 
 			if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -431,7 +441,7 @@ namespace Particle
 		//{
 
 		//}
-		
+
 
 	}
 }

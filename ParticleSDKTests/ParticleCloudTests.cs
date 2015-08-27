@@ -158,7 +158,7 @@ namespace ParticleSDKTests
 				var result = await cloud.SignupWithUserAsync("test", "test");
 				Assert.IsNotNull(result);
 				Assert.IsFalse(result.Success);
-				Assert.AreEqual("Sign up error", result.Error);
+				Assert.AreEqual("username must be an email address", result.Error);
 				Assert.AreEqual("username must be an email address", result.ErrorDescription);
 
 				cloud.RequestCallBack = (t, m, p) =>
@@ -178,5 +178,60 @@ namespace ParticleSDKTests
 				Assert.IsTrue(result.Success);
 			}
 		}
+
+		[TestMethod]
+		public async Task RequestPasswordResetAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.NotFound,
+						Response = JToken.Parse(@"
+{
+'ok': false,
+'error': 'User not found.'
+}")
+					};
+				};
+
+				var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.RequestPasswordResetAsync(null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("email", ex.ParamName);
+
+				var result = await cloud.RequestPasswordResetAsync("test");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("User not found.", result.Error);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"
+{
+'ok': true,
+'message': 'Password reset email sent.'
+}")
+					};
+				};
+
+				result = await cloud.RequestPasswordResetAsync("test@test.com");
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				Assert.AreEqual("Password reset email sent.", result.Data);
+			}
+		}
+		/*{
+"ok": false,
+"error": "User not found."
+}*/
+		/*
+		{
+		  "ok": true,
+		  "message": "Password reset email sent."
+		}*/
 	}
 }

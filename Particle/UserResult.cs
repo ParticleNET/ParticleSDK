@@ -25,7 +25,7 @@ namespace Particle
 	/// <summary>
 	/// Represents the results from SignupWithUserAsync
 	/// </summary>
-	public class CreateUserResult
+	public class UserResult
 	{
 		/// <summary>
 		/// Gets or sets a value indicating whether the user was created.
@@ -37,6 +37,14 @@ namespace Particle
 		public bool Ok { get; set; }
 
 		/// <summary>
+		/// Gets or sets the message.
+		/// </summary>
+		/// <value>
+		/// The message.
+		/// </value>
+		public String Message { get; set; }
+
+		/// <summary>
 		/// Gets or sets the errors.
 		/// </summary>
 		/// <value>
@@ -44,11 +52,47 @@ namespace Particle
 		/// </value>
 		[JsonProperty("errors")]
 		public String[] Errors { get; set; }
-		/*{
-  "ok": false,
-  "errors": [
-	"username must be an email address"
-  ]
-}*/
+
+		/// <summary>
+		/// Gets or sets the error.
+		/// </summary>
+		/// <value>
+		/// The error.
+		/// </value>
+		[JsonProperty("error")]
+		public String Error
+		{
+			get
+			{
+				if(Errors != null && Errors.Length > 0)
+				{
+					return Errors[0];
+				}
+
+				return null;
+			}
+			set
+			{
+				Errors = new String[] { value };
+			}
+		}
+
+		/// <summary>
+		/// Converts this <see cref="UserResult"/> to a <see cref="Result{String}"/>
+		/// </summary>
+		/// <returns></returns>
+		public Result<String> AsResult()
+		{
+			var result = new Result<String>();
+			result.Success = Ok;
+			result.Error = Error;
+			result.ErrorDescription = result.Error;
+			if(Message != null)
+			{
+				result.Data = Message;
+			}
+
+			return result;
+		}
 	}
 }
