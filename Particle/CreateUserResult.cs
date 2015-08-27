@@ -13,42 +13,42 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Particle
 {
 	/// <summary>
-	/// Extensions the ParicleSDK uses
+	/// Represents the results from SignupWithUserAsync
 	/// </summary>
-	public static class Extensions
+	public class CreateUserResult
 	{
 		/// <summary>
-		/// Runs the provided <paramref name="action"/> on the SynchronizationContext if one is provided otherwise runs the action on the current thread
+		/// Gets or sets a value indicating whether the user was created.
 		/// </summary>
-		/// <param name="context">The SynchronizationContext.</param>
-		/// <param name="action">The action to run</param>
-		public static void InvokeIfRequired(this SynchronizationContext context, Action action)
-		{
-			if(context == null)
-			{
-				action();
-				return;
-			}
+		/// <value>
+		///   <c>true</c> if ok; otherwise, <c>false</c>.
+		/// </value>
+		[JsonProperty("ok")]
+		public bool Ok { get; set; }
 
-			if (SynchronizationContext.Current == context)
-			{
-				action();
-			}
-			else
-			{
-				context.Post(new SendOrPostCallback((t)=> { action(); }), context); // send = synchronously
-																	// context.Post(action)  - post is asynchronous.
-			}
-		}
+		/// <summary>
+		/// Gets or sets the errors.
+		/// </summary>
+		/// <value>
+		/// The errors.
+		/// </value>
+		[JsonProperty("errors")]
+		public String[] Errors { get; set; }
+		/*{
+  "ok": false,
+  "errors": [
+	"username must be an email address"
+  ]
+}*/
 	}
 }

@@ -59,7 +59,7 @@ namespace Particle
 		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
 		/// </summary>
 		public ParticleCloud()
-					: this(new Uri("https://api.particle.io/v1/"))
+			: this(new Uri("https://api.particle.io/v1/"))
 		{
 
 		}
@@ -133,13 +133,13 @@ namespace Particle
 			{
 				throw new ArgumentNullException(nameof(method));
 			}
-
+			
 			if (authResults == null)
 			{
 				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
 			}
 
-
+			
 			client.DefaultRequestHeaders.Clear();
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 
@@ -294,16 +294,51 @@ namespace Particle
 				Error = postResults.StatusCode.ToString()
 			};
 		}
-		// <summary>
-		// Sign up with new account credentials to Spark cloud
-		// </summary>
-		// <param name="username">Required user name, must be a valid email address</param>
-		// <param name="password">Required password</param>
-		// <returns></returns>
-		//public async Task<SignupResults> SignupWithUserAsync(String username, String password)
-		//{
 
-		//}
+		/// <summary>
+		/// Sign up with new account credentials to Particle cloud
+		/// </summary>
+		/// <param name="username">Required user name, must be a valid email address</param>
+		/// <param name="password">Required password</param>
+		/// <returns></returns>
+		public async Task<Result> SignupWithUserAsync(String username, String password)
+		{
+			if (String.IsNullOrWhiteSpace(username))
+			{
+				throw new ArgumentNullException(nameof(username));
+			}
+			if (String.IsNullOrWhiteSpace(password))
+			{
+				throw new ArgumentNullException(nameof(password));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+
+			var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
+			
+			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var createResult = result.Response.ToObject<CreateUserResult>();
+				if (createResult.Ok)
+				{
+					return new Result(true);
+				}
+				else
+				{
+					var e = new Result(false);
+					if (createResult.Errors != null && createResult.Errors.Length > 0)
+					{
+						e.Error = "Sign up error";
+						e.ErrorDescription = createResult.Errors[0];
+					}
+					return e;
+				}
+			}
+			else
+			{
+				return result.AsResult();
+			}
+		}
 
 		/// <summary>
 		/// Logs the user out locally
@@ -396,7 +431,7 @@ namespace Particle
 		//{
 
 		//}
-
+		
 
 	}
 }
