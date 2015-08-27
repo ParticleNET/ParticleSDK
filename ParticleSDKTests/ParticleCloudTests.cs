@@ -34,7 +34,7 @@ namespace ParticleSDKTests
 		[TestMethod]
 		public async Task MakeGetRequestAsyncTest()
 		{
-			using(var cloud = new ParticleCloud())
+			using (var cloud = new ParticleCloud())
 			{
 				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.MakeGetRequestAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("method", exc.ParamName);
@@ -82,7 +82,7 @@ namespace ParticleSDKTests
 					return new RequestResponse
 					{
 						StatusCode = HttpStatusCode.OK,
-						Response= JToken.Parse(@"[
+						Response = JToken.Parse(@"[
 						{
 							""id"": ""1"",
 							""name"": ""Work"",
@@ -129,6 +129,53 @@ namespace ParticleSDKTests
 				device = devices[2];
 				Assert.AreEqual("3", device.Id);
 				Assert.AreEqual("Proto", device.Name);
+			}
+		}
+
+		[TestMethod]
+		public async Task SignupWithUserAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"
+{
+	ok: false,
+	errors:[""username must be an email address""]
+}")
+					};
+				};
+
+				ArgumentNullException e = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.SignupWithUserAsync(null, "test").GetAwaiter().GetResult(); });
+				Assert.AreEqual("username", e.ParamName);
+				e = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.SignupWithUserAsync("test", null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("password", e.ParamName);
+
+				var result = await cloud.SignupWithUserAsync("test", "test");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("Sign up error", result.Error);
+				Assert.AreEqual("username must be an email address", result.ErrorDescription);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"
+{
+	ok: true
+}")
+					};
+				};
+
+				result = await cloud.SignupWithUserAsync("test@test.com", "test");
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
 			}
 		}
 	}

@@ -303,11 +303,41 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result> SignupWithUserAsync(String username, String password)
 		{
-			// /v1/users/signUp
-			// Post:
-			// username
-			// password
-			return null;
+			if (String.IsNullOrWhiteSpace(username))
+			{
+				throw new ArgumentNullException(nameof(username));
+			}
+			if (String.IsNullOrWhiteSpace(password))
+			{
+				throw new ArgumentNullException(nameof(password));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+
+			var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
+			
+			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var createResult = result.Response.ToObject<CreateUserResult>();
+				if (createResult.Ok)
+				{
+					return new Result(true);
+				}
+				else
+				{
+					var e = new Result(false);
+					if (createResult.Errors != null && createResult.Errors.Length > 0)
+					{
+						e.Error = "Sign up error";
+						e.ErrorDescription = createResult.Errors[0];
+					}
+					return e;
+				}
+			}
+			else
+			{
+				return result.AsResult();
+			}
 		}
 
 		/// <summary>
