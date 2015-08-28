@@ -80,6 +80,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\LICENSE">
+      <Link>LICENSE</Link>
+    </EmbeddedResource>
     <None Include="App.config" />
     <None Include="DeveloperSettings.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
