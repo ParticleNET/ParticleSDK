@@ -206,35 +206,81 @@ namespace ParticleSDKTests
 		[TestMethod]
 		public async Task CallFunctionAsyncTest()
 		{
-			ParticleCloudMock cloud = new ParticleCloudMock();
-			cloud.RequestCallBack = (a, b, c) =>
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				Assert.AreEqual("POST", a);
-				Assert.AreEqual("devices/3/led", b);
-				Assert.AreEqual(1, c.Count());
-				var first = c.FirstOrDefault();
-				Assert.IsNotNull(first);
-				Assert.AreEqual("arg", first.Key);
-				Assert.AreEqual("on", first.Value);
-				return new RequestResponse
+				cloud.RequestCallBack = (a, b, c) =>
 				{
-					StatusCode = System.Net.HttpStatusCode.OK,
-					Response = JToken.Parse(@"{
+					Assert.AreEqual("POST", a);
+					Assert.AreEqual("devices/3/led", b);
+					Assert.AreEqual(1, c.Count());
+					var first = c.FirstOrDefault();
+					Assert.IsNotNull(first);
+					Assert.AreEqual("arg", first.Key);
+					Assert.AreEqual("on", first.Value);
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.OK,
+						Response = JToken.Parse(@"{
   'id': '3',
   'name': 'led',
   'last_app': '',
   'connected': true,
   'return_value': 1
 }")
+					};
 				};
-			};
 
-			var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'functions':['led']}"));
-			var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
-			Assert.AreEqual("functionName", exc.ParamName);
-			var result = await p.CallFunctionAsync("led", "on");
-			Assert.IsTrue(result.Success);
-			Assert.AreEqual(1, result.Data);
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'functions':['led']}"));
+				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
+				Assert.AreEqual("functionName", exc.ParamName);
+				var result = await p.CallFunctionAsync("led", "on");
+				Assert.IsTrue(result.Success);
+				Assert.AreEqual(1, result.Data);
+			}
+		}
+
+		[TestMethod]
+		public async Task UnclaimAsyncTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					Assert.AreEqual("DELETE", a);
+					Assert.AreEqual("devices/3", b);
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.Forbidden,
+						Response = JToken.Parse(@"{
+		  'error': 'Permission Denied',
+		  'info': 'I didn\'t recognize that device name or ID, try opening https://api.particle.io/v1/devices?access_token=...'
+		}")
+					};
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+
+				var result = await p.UnclaimAsync();
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("Permission Denied", result.Error);
+				Assert.AreEqual("I didn\'t recognize that device name or ID, try opening https://api.particle.io/v1/devices?access_token=...", result.Message);
+
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.OK,
+						Response = JToken.Parse(@"{
+	  'ok': true
+	}")
+					};
+				};
+
+				result = await p.UnclaimAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+			}
 		}
 	}
 }

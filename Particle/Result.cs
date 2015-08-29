@@ -53,6 +53,22 @@ namespace Particle
 		[JsonProperty("message")]
 		public String Message { get; set; }
 
+
+		/// <summary>
+		/// Redirect info in the json to the Massage property<seealso cref="Message"/> 
+		/// </summary>
+		/// <value>
+		/// <seealso cref="Message" />
+		/// </value>
+		[JsonProperty("info")]
+		public String Info
+		{
+			set
+			{
+				Message = value;
+			}
+		}
+
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="Result"/> is success.
 		/// </summary>

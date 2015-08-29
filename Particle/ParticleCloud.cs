@@ -36,7 +36,7 @@ namespace Particle
 		private HttpClient client;
 		private Uri baseUri;
 		private AuthenticationResults authResults;
-		
+
 
 		/// <summary>
 		/// Set this to the UI threads SynchronizationContext
@@ -206,6 +206,53 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Makes the delete request asynchronous to the particle cloud
+		/// </summary>
+		/// <param name="method">The method.</param>
+		/// <returns></returns>
+		public virtual async Task<RequestResponse> MakeDeleteRequestAsync(String method)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			if (authResults == null)
+			{
+				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+
+			HttpResponseMessage response;
+			response = await client.DeleteAsync(method);
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		/// <summary>
+		/// Calls <seealso cref="MakeDeleteRequestAsync(string)"/> and if it returns a status code of Unauthorized try s to refresh the token and makes the request again
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <returns>The results from the request</returns>
+		public virtual async Task<RequestResponse> MakeDeleteRequestWithAuthTestAsync(String method)
+		{
+			var response = await MakeDeleteRequestAsync(method);
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				response = await MakeDeleteRequestAsync(method);
+			}
+
+			return response;
+		}
+
+		/// <summary>
 		/// Refreshes the access token asynchronous.
 		/// </summary>
 		/// <returns>The results of the request to refresh the token</returns>
@@ -340,7 +387,7 @@ namespace Particle
 			}
 
 			var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
-			
+
 			return result.AsResult();
 		}
 
@@ -404,18 +451,18 @@ namespace Particle
 		{
 			var respose = await MakeGetRequestWithAuthTestAsync("devices");
 
-			if(respose.StatusCode == System.Net.HttpStatusCode.OK)
+			if (respose.StatusCode == System.Net.HttpStatusCode.OK)
 			{
 				await Task.Run(() =>
 				{
 					List<String> deviceIds = new List<string>();
 
-					foreach(JObject obj in (JArray)respose.Response)
+					foreach (JObject obj in (JArray)respose.Response)
 					{
 						String id = obj.SelectToken("id").Value<String>();
 						deviceIds.Add(id);
 						var device = Devices.FirstOrDefault(i => String.Compare(i.Id, id) == 0);
-						if(device == null)
+						if (device == null)
 						{
 							device = new ParticleDevice(this, obj);
 							ParticleCloud.SyncContext.InvokeIfRequired(() =>
@@ -430,7 +477,7 @@ namespace Particle
 					}
 
 					var removeDevices = Devices.Where(i => !deviceIds.Contains(i.Id)).ToList();
-					foreach(var rdevice in removeDevices)
+					foreach (var rdevice in removeDevices)
 					{
 						ParticleCloud.SyncContext.InvokeIfRequired(() =>
 						{

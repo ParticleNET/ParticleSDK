@@ -62,5 +62,18 @@ namespace ParticleSDKTests
 				throw new NullReferenceException("Please provide a RequestCallBack for this test");
 			});
 		}
+
+		public override Task<RequestResponse> MakeDeleteRequestAsync(string method)
+		{
+			return Task.Run<RequestResponse>(() =>
+			{
+				if (RequestCallBack != null)
+				{
+					return RequestCallBack("DELETE", method, null);
+				}
+
+				throw new NullReferenceException("Please provide a RequestCallBack for this test");
+			});
+		}
 	}
 }
