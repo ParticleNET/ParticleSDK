@@ -174,7 +174,6 @@ namespace ParticleSDKTests
 				Assert.IsNotNull(result);
 				Assert.IsFalse(result.Success);
 				Assert.AreEqual("username must be an email address", result.Error);
-				Assert.AreEqual("username must be an email address", result.ErrorDescription);
 
 				cloud.RequestCallBack = (t, m, p) =>
 				{
@@ -236,17 +235,55 @@ namespace ParticleSDKTests
 				result = await cloud.RequestPasswordResetAsync("test@test.com");
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
-				Assert.AreEqual("Password reset email sent.", result.Data);
+				Assert.AreEqual("Password reset email sent.", result.Message);
 			}
 		}
-		/*{
-"ok": false,
-"error": "User not found."
-}*/
-		/*
+
+		[TestMethod]
+		public async Task ClaimDeviceAsyncTest()
 		{
-		  "ok": true,
-		  "message": "Password reset email sent."
-		}*/
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.NotFound,
+						Response = JToken.Parse(@"
+{
+ok: false,
+errors: ['device does not exist']
+}")
+					};
+				};
+
+				var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.ClaimDeviceAsync(null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("deviceId", ex.ParamName);
+
+				var result = await cloud.ClaimDeviceAsync("123");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("device does not exist", result.Error);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.NotFound,
+						Response = JToken.Parse(@"
+{
+  'user_id': '111111111111111111111111',
+  'id': '222222222222222222222222',
+  'connected': true,
+  'ok': true
+}")
+					};
+				};
+
+				result = await cloud.ClaimDeviceAsync("222222222222222222222222");
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+			}
+		}
 	}
 }

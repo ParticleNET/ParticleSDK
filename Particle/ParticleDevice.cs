@@ -262,7 +262,7 @@ namespace Particle
 		/// Parses the JSon Object representing a particle device
 		/// </summary>
 		/// <param name="obj">The object.</param>
-		protected virtual void ParseObject(JObject obj)
+		protected internal virtual void ParseObject(JObject obj)
 		{
 			if (obj == null)
 			{
