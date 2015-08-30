@@ -148,6 +148,105 @@ namespace ParticleSDKTests
 		}
 
 		[TestMethod]
+		public async Task RefreshDevicesAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"[
+						{
+							""id"": ""1"",
+							""name"": ""Work"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:36.034Z"",
+							""product_id"": 0,
+							""connected"": false
+						},
+						{
+							""id"": ""2"",
+							""name"": ""Home"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:59.188Z"",
+							""product_id"": 0,
+							""connected"": false
+						},
+						{
+							""id"": ""3"",
+							""name"": ""Proto"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-07-24T00:37:07.820Z"",
+							""product_id"": 6,
+							""connected"": true
+						}
+]")
+					};
+				};
+
+				var result = await cloud.RefreshDevicesAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				var devices = cloud.Devices;
+				Assert.AreEqual(3, devices.Count);
+				var device = devices[0];
+				Assert.AreEqual("1", device.Id);
+				Assert.AreEqual("Work", device.Name);
+				device = devices[1];
+				Assert.AreEqual("2", device.Id);
+				Assert.AreEqual("Home", device.Name);
+				device = devices[2];
+				Assert.AreEqual("3", device.Id);
+				Assert.AreEqual("Proto", device.Name);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"[
+						{
+							""id"": ""1"",
+							""name"": ""Work"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:36.034Z"",
+							""product_id"": 0,
+							""connected"": false
+						},
+						{
+							""id"": ""4"",
+							""name"": ""Home2"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:59.188Z"",
+							""product_id"": 0,
+							""connected"": false
+						}
+]")
+					};
+				};
+
+				result = await cloud.RefreshDevicesAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				devices = cloud.Devices;
+				Assert.AreEqual(2, devices.Count);
+				device = devices[0];
+				Assert.AreEqual("1", device.Id);
+				Assert.AreEqual("Work", device.Name);
+				device = devices[1];
+				Assert.AreEqual("4", device.Id);
+				Assert.AreEqual("Home2", device.Name);
+			}
+		}
+
+		[TestMethod]
 		public async Task SignupWithUserAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
