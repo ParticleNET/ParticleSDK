@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 Sannel Software, L.L.C.
+Copyright 2015 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using Particle.Results;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
@@ -35,6 +36,7 @@ namespace Particle
 		private HttpClient client;
 		private Uri baseUri;
 		private AuthenticationResults authResults;
+
 
 		/// <summary>
 		/// Set this to the UI threads SynchronizationContext
@@ -54,6 +56,31 @@ namespace Particle
 				return authResults?.AccessToken?.Length > 0;
 			}
 		}
+
+		private bool isRefreshing;
+
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is refreshing.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this device list is refreshing; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsRefreshing
+		{
+			get { return isRefreshing; }
+			protected set { SetProperty(ref isRefreshing, value); }
+		}
+
+		/// <summary>
+		/// Gets the list of devices. Call RefreshDevices to refresh this list.
+		/// </summary>
+		/// <value>
+		/// The devices.
+		/// </value>
+		public ObservableCollection<ParticleDevice> Devices
+		{
+			get;
+		} = new ObservableCollection<ParticleDevice>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
@@ -133,13 +160,13 @@ namespace Particle
 			{
 				throw new ArgumentNullException(nameof(method));
 			}
-			
+
 			if (authResults == null)
 			{
 				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
 			}
 
-			
+
 			client.DefaultRequestHeaders.Clear();
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 
@@ -173,6 +200,109 @@ namespace Particle
 			{
 				await RefreshTokenAsync();
 				response = await MakePostRequestAsync(method, arguments);
+			}
+
+			return response;
+		}
+
+		/// <summary>
+		/// Makes the put request asynchronous to the particle cloud
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <param name="arguments">The arguments to pass during the call</param>
+		/// <returns>The results of the request</returns>
+		public virtual async Task<RequestResponse> MakePutRequestAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			if (authResults == null)
+			{
+				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+
+			HttpResponseMessage response;
+			if (arguments != null)
+			{
+				response = await client.PutAsync(method, new FormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PutAsync(method, null);
+			}
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		/// <summary>
+		/// Calls <seealso cref="MakePutRequestAsync(string, KeyValuePair{string, string}[])"/> and if it returns a status code of Unauthorized try s to refresh the token and makes the request again
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <param name="arguments">The arguments to pass during the call</param>
+		/// <returns>The results from the request</returns>
+		public virtual async Task<RequestResponse> MakePutRequestWithAuthTestAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			var response = await MakePutRequestAsync(method, arguments);
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				response = await MakePutRequestAsync(method, arguments);
+			}
+
+			return response;
+		}
+
+		/// <summary>
+		/// Makes the delete request asynchronous to the particle cloud
+		/// </summary>
+		/// <param name="method">The method.</param>
+		/// <returns></returns>
+		public virtual async Task<RequestResponse> MakeDeleteRequestAsync(String method)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			if (authResults == null)
+			{
+				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+
+			HttpResponseMessage response;
+			response = await client.DeleteAsync(method);
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		/// <summary>
+		/// Calls <seealso cref="MakeDeleteRequestAsync(string)"/> and if it returns a status code of Unauthorized try s to refresh the token and makes the request again
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <returns>The results from the request</returns>
+		public virtual async Task<RequestResponse> MakeDeleteRequestWithAuthTestAsync(String method)
+		{
+			var response = await MakeDeleteRequestAsync(method);
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				response = await MakeDeleteRequestAsync(method);
 			}
 
 			return response;
@@ -312,32 +442,26 @@ namespace Particle
 				throw new ArgumentNullException(nameof(password));
 			}
 
-			client.DefaultRequestHeaders.Clear();
-
 			var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
-			
-			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+
+			return result.AsResult();
+		}
+
+		/// <summary>
+		/// Requests the password be reset.
+		/// </summary>
+		/// <param name="email">The email.</param>
+		/// <returns></returns>
+		public async Task<Result> RequestPasswordResetAsync(String email)
+		{
+			if (String.IsNullOrWhiteSpace(email))
 			{
-				var createResult = result.Response.ToObject<CreateUserResult>();
-				if (createResult.Ok)
-				{
-					return new Result(true);
-				}
-				else
-				{
-					var e = new Result(false);
-					if (createResult.Errors != null && createResult.Errors.Length > 0)
-					{
-						e.Error = "Sign up error";
-						e.ErrorDescription = createResult.Errors[0];
-					}
-					return e;
-				}
+				throw new ArgumentNullException(nameof(email));
 			}
-			else
-			{
-				return result.AsResult();
-			}
+
+			var result = await MakePostRequestAsync("user/password-reset", new KeyValuePair<string, string>("username", email));
+
+			return result.AsResult();
 		}
 
 		/// <summary>
@@ -354,16 +478,7 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result<List<ParticleDevice>>> GetDevicesAsync()
 		{
-			var response = await MakeGetRequestAsync("devices");
-			if(response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-			{
-				await RefreshTokenAsync();
-				 response = await MakeGetRequestAsync("devices");
-				 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-				 {
-					return response.AsResult<List<ParticleDevice>>();
-				 }
-			}
+			var response = await MakeGetRequestWithAuthTestAsync("devices");
 
 			if (response.StatusCode == System.Net.HttpStatusCode.OK)
 			{
@@ -381,6 +496,57 @@ namespace Particle
 			else
 			{
 				return response.AsResult<List<ParticleDevice>>();
+			}
+		}
+
+		/// <summary>
+		/// Refreshes the devices list for the logged in user
+		/// </summary>
+		/// <returns></returns>
+		public async Task<Result> RefreshDevicesAsync()
+		{
+			var respose = await MakeGetRequestWithAuthTestAsync("devices");
+
+			if (respose.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				await Task.Run(() =>
+				{
+					List<String> deviceIds = new List<string>();
+
+					foreach (JObject obj in (JArray)respose.Response)
+					{
+						String id = obj.SelectToken("id").Value<String>();
+						deviceIds.Add(id);
+						var device = Devices.FirstOrDefault(i => String.Compare(i.Id, id) == 0);
+						if (device == null)
+						{
+							device = new ParticleDevice(this, obj);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								Devices.Add(device);
+							});
+						}
+						else
+						{
+							device.ParseObject(obj);
+						}
+					}
+
+					var removeDevices = Devices.Where(i => !deviceIds.Contains(i.Id)).ToList();
+					foreach (var rdevice in removeDevices)
+					{
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Devices.Remove(rdevice);
+						});
+					}
+				});
+
+				return new Result(true);
+			}
+			else
+			{
+				return respose.AsResult();
 			}
 		}
 
@@ -414,15 +580,22 @@ namespace Particle
 
 		//}
 
-		// <summary>
-		// Claims the specified device for the logged in user
-		// </summary>
-		// <param name="deviceId">The id of the new device</param>
-		// <returns></returns>
-		//public async Task<ClaimResult> ClaimDeviceAsync(String deviceId)
-		//{
+		/// <summary>
+		/// Claims the specified device for the logged in user
+		/// </summary>
+		/// <param name="deviceId">The id of the new device</param>
+		/// <returns></returns>
+		public async Task<Result> ClaimDeviceAsync(String deviceId)
+		{
+			if (String.IsNullOrWhiteSpace(deviceId))
+			{
+				throw new ArgumentNullException(nameof(deviceId));
+			}
 
-		//}
+			var result = await MakePostRequestWithAuthTestAsync("devices", new KeyValuePair<string, string>("id", deviceId));
+			var userResult = result.AsResult();
+			return userResult;
+		}
 
 		// <summary>
 		// Get a short-lived claiming token for transmitting to soon-to-be-claimed device in soft AP setup process
@@ -431,7 +604,7 @@ namespace Particle
 		//{
 
 		//}
-		
+
 
 	}
 }

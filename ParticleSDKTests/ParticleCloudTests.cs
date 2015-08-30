@@ -1,4 +1,19 @@
-﻿using System;
+﻿/*
+Copyright 2015 ParticleNET
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Particle;
 using Sannel.Helpers;
@@ -133,6 +148,105 @@ namespace ParticleSDKTests
 		}
 
 		[TestMethod]
+		public async Task RefreshDevicesAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"[
+						{
+							""id"": ""1"",
+							""name"": ""Work"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:36.034Z"",
+							""product_id"": 0,
+							""connected"": false
+						},
+						{
+							""id"": ""2"",
+							""name"": ""Home"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:59.188Z"",
+							""product_id"": 0,
+							""connected"": false
+						},
+						{
+							""id"": ""3"",
+							""name"": ""Proto"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-07-24T00:37:07.820Z"",
+							""product_id"": 6,
+							""connected"": true
+						}
+]")
+					};
+				};
+
+				var result = await cloud.RefreshDevicesAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				var devices = cloud.Devices;
+				Assert.AreEqual(3, devices.Count);
+				var device = devices[0];
+				Assert.AreEqual("1", device.Id);
+				Assert.AreEqual("Work", device.Name);
+				device = devices[1];
+				Assert.AreEqual("2", device.Id);
+				Assert.AreEqual("Home", device.Name);
+				device = devices[2];
+				Assert.AreEqual("3", device.Id);
+				Assert.AreEqual("Proto", device.Name);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"[
+						{
+							""id"": ""1"",
+							""name"": ""Work"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:36.034Z"",
+							""product_id"": 0,
+							""connected"": false
+						},
+						{
+							""id"": ""4"",
+							""name"": ""Home2"",
+							""last_app"": null,
+							""last_ip_address"": ""192.168.0.1"",
+							""last_heard"": ""2015-05-25T01:15:59.188Z"",
+							""product_id"": 0,
+							""connected"": false
+						}
+]")
+					};
+				};
+
+				result = await cloud.RefreshDevicesAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				devices = cloud.Devices;
+				Assert.AreEqual(2, devices.Count);
+				device = devices[0];
+				Assert.AreEqual("1", device.Id);
+				Assert.AreEqual("Work", device.Name);
+				device = devices[1];
+				Assert.AreEqual("4", device.Id);
+				Assert.AreEqual("Home2", device.Name);
+			}
+		}
+
+		[TestMethod]
 		public async Task SignupWithUserAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -158,8 +272,7 @@ namespace ParticleSDKTests
 				var result = await cloud.SignupWithUserAsync("test", "test");
 				Assert.IsNotNull(result);
 				Assert.IsFalse(result.Success);
-				Assert.AreEqual("Sign up error", result.Error);
-				Assert.AreEqual("username must be an email address", result.ErrorDescription);
+				Assert.AreEqual("username must be an email address", result.Error);
 
 				cloud.RequestCallBack = (t, m, p) =>
 				{
@@ -174,6 +287,99 @@ namespace ParticleSDKTests
 				};
 
 				result = await cloud.SignupWithUserAsync("test@test.com", "test");
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+			}
+		}
+
+		[TestMethod]
+		public async Task RequestPasswordResetAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.NotFound,
+						Response = JToken.Parse(@"
+{
+'ok': false,
+'error': 'User not found.'
+}")
+					};
+				};
+
+				var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.RequestPasswordResetAsync(null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("email", ex.ParamName);
+
+				var result = await cloud.RequestPasswordResetAsync("test");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("User not found.", result.Error);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.OK,
+						Response = JToken.Parse(@"
+{
+'ok': true,
+'message': 'Password reset email sent.'
+}")
+					};
+				};
+
+				result = await cloud.RequestPasswordResetAsync("test@test.com");
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				Assert.AreEqual("Password reset email sent.", result.Message);
+			}
+		}
+
+		[TestMethod]
+		public async Task ClaimDeviceAsyncTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.NotFound,
+						Response = JToken.Parse(@"
+{
+ok: false,
+errors: ['device does not exist']
+}")
+					};
+				};
+
+				var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.ClaimDeviceAsync(null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("deviceId", ex.ParamName);
+
+				var result = await cloud.ClaimDeviceAsync("123");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("device does not exist", result.Error);
+
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					return new RequestResponse
+					{
+						StatusCode = HttpStatusCode.NotFound,
+						Response = JToken.Parse(@"
+{
+  'user_id': '111111111111111111111111',
+  'id': '222222222222222222222222',
+  'connected': true,
+  'ok': true
+}")
+					};
+				};
+
+				result = await cloud.ClaimDeviceAsync("222222222222222222222222");
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
 			}

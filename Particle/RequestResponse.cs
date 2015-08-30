@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 Sannel Software, L.L.C.
+Copyright 2015 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -47,12 +47,33 @@ namespace Particle
 		/// <summary>
 		/// Converts the JSon response to a Result
 		/// </summary>
-		/// <param name="success">if set to <c>true</c> [success].</param>
 		/// <returns></returns>
-		public Result AsResult(bool success = false)
+		public Result AsResult()
 		{
 			var result = Response.ToObject<Result>();
+			return result;
+		}
+
+		/// <summary>
+		/// Converts the JSon response to a Result
+		/// </summary>
+		/// <param name="success">if set to <c>true</c> [success].</param>
+		/// <returns></returns>
+		public Result AsResult(bool success)
+		{
+			var result = AsResult();
 			result.Success = success;
+			return result;
+		}
+
+		/// <summary>
+		/// Converts the JSon response to a Result
+		/// </summary>
+		/// <typeparam name="T">Type of the results</typeparam>
+		/// <returns></returns>
+		public Result<T> AsResult<T>()
+		{
+			var result = Response.ToObject<Result<T>>();
 			return result;
 		}
 
@@ -62,9 +83,9 @@ namespace Particle
 		/// <typeparam name="T">Type of the results</typeparam>
 		/// <param name="success">if set to <c>true</c> [success].</param>
 		/// <returns></returns>
-		public Result<T> AsResult<T>(bool success = false)
+		public Result<T> AsResult<T>(bool success)
 		{
-			var result = Response.ToObject<Result<T>>();
+			var result = AsResult<T>();
 			result.Success = success;
 			return result;
 		}
