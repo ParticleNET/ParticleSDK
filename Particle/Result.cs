@@ -63,6 +63,29 @@ namespace Particle
 		[JsonProperty("info")]
 		public String Info
 		{
+			get
+			{
+				return Message;
+			}
+			set
+			{
+				Message = value;
+			}
+		}
+
+		/// <summary>
+		/// Redirect status in the json to the Massage property<seealso cref="Message"/> 
+		/// </summary>
+		/// <value>
+		/// <seealso cref="Message" />
+		/// </value>
+		[JsonProperty("status")]
+		public String Status
+		{
+			get
+			{
+				return Message;
+			}
 			set
 			{
 				Message = value;

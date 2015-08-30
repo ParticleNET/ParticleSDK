@@ -543,59 +543,84 @@ namespace Particle
 			{
 				return result.AsResult();
 			}
+		}
+
+		/// <summary>
+		/// Flashes a known application to a device.
+		/// </summary>
+		/// <param name="appName">Name of the application.</param>
+		/// <returns></returns>
+		public async Task<Result> FlashKnownAppAsync(String appName)
+		{
+			if (String.IsNullOrWhiteSpace(appName))
+			{
+				throw new ArgumentNullException(nameof(appName));
+			}
+
+			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
+			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var r = result.AsResult();
+				if (String.IsNullOrWhiteSpace(r.Error))
+				{
+					r.Success = true;
+				}
+				return r;
+			}
+			else
+			{
+				return result.AsResult();
+			}
 			/*
-			@FormUrlEncoded
-		@PUT("/v1/devices/{deviceID}")
-		Response nameDevice(@Path("deviceID") String deviceID,
-							@Field("name") String name);*/
-			/*{
-name: "newTest"
-id: "1234"
-}*/
+{
+  "id": "310049000647343339373536",
+  "status": "Update started"
+}
+*/
 			/*
 			{
-			  "error": "Nothing to do?"
+			  "ok": false,
+			  "code": 500,
+			  "errors": [
+				"Can't flash unknown app tinke"
+			  ]
 			}*/
 		}
 
-		// this method signature should probably change
-		/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
-		{
-			throw new NotImplementedException();
-		}*/
+					// this method signature should probably change
+					/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
+					{
+						throw new NotImplementedException();
+					}*/
 
-		// this method signature should probably change
-		/*public async Task<Result> FlashKnownAppAsync(String appName)
-		{
-			throw new NotImplementedException();
-		}*/
 
-		// this method signature should probably change
-		/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
-		{
-			throw new NotImplementedException();
-		}*/
 
-		/*id: "00000"
-name: "Proto"
-last_app: null
-last_ip_address: "174.33.197.239"
-last_heard: "2015-07-11T05:25:09.960Z"
-product_id: 6
-connected: true*/
+			// this method signature should probably change
+			/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
+			{
+				throw new NotImplementedException();
+			}*/
 
-		/*
-id: "00000"
-name: "Proto"
-connected: true
-variables: {
-temp: "double"
-}-
-functions: [1]
-0:  "led"
--
-cc3000_patch_version: null
-product_id: 6
-last_heard: "2015-07-11T05:32:56.614Z"*/
-	}
+			/*id: "00000"
+	name: "Proto"
+	last_app: null
+	last_ip_address: "174.33.197.239"
+	last_heard: "2015-07-11T05:25:09.960Z"
+	product_id: 6
+	connected: true*/
+
+			/*
+	id: "00000"
+	name: "Proto"
+	connected: true
+	variables: {
+	temp: "double"
+	}-
+	functions: [1]
+	0:  "led"
+	-
+	cc3000_patch_version: null
+	product_id: 6
+	last_heard: "2015-07-11T05:32:56.614Z"*/
+		}
 	}
