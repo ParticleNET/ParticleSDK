@@ -206,6 +206,62 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Makes the put request asynchronous to the particle cloud
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <param name="arguments">The arguments to pass during the call</param>
+		/// <returns>The results of the request</returns>
+		public virtual async Task<RequestResponse> MakePutRequestAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			if (authResults == null)
+			{
+				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+
+			HttpResponseMessage response;
+			if (arguments != null)
+			{
+				response = await client.PutAsync(method, new FormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PutAsync(method, null);
+			}
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		/// <summary>
+		/// Calls <seealso cref="MakePutRequestAsync(string, KeyValuePair{string, string}[])"/> and if it returns a status code of Unauthorized try s to refresh the token and makes the request again
+		/// </summary>
+		/// <param name="method">The method to call</param>
+		/// <param name="arguments">The arguments to pass during the call</param>
+		/// <returns>The results from the request</returns>
+		public virtual async Task<RequestResponse> MakePutRequestWithAuthTestAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			var response = await MakePutRequestAsync(method, arguments);
+			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			{
+				await RefreshTokenAsync();
+				response = await MakePutRequestAsync(method, arguments);
+			}
+
+			return response;
+		}
+
+		/// <summary>
 		/// Makes the delete request asynchronous to the particle cloud
 		/// </summary>
 		/// <param name="method">The method.</param>

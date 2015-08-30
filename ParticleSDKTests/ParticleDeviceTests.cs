@@ -33,7 +33,7 @@ namespace ParticleSDKTests
 			var p = new ParticleDeviceMock(new JObject());
 			var message = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.ParseObjectMock(null); });
 			Assert.AreEqual("obj", message.ParamName);
-			
+
 			var obj = JObject.Parse(@"{'id':'3a', 'name':null}");
 			p.ParseObjectMock(obj);
 			Assert.AreEqual("3a", p.Id);
@@ -168,7 +168,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual("variable", ex.ParamName);
 			ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.GetVariableValueAsync((Variable)null).GetAwaiter().GetResult(); });
 			Assert.AreEqual("variable", ex.ParamName);
-			
+
 			var results = await p.GetVariableValueAsync("temp");
 			Assert.IsTrue(results.Success);
 			Assert.IsNotNull(results.Data);
@@ -278,6 +278,62 @@ namespace ParticleSDKTests
 				};
 
 				result = await p.UnclaimAsync();
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+			}
+		}
+
+		[TestMethod]
+		public async Task RenameAsyncTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					Assert.AreEqual("PUT", a);
+					Assert.AreEqual("devices/3", b);
+					Assert.AreEqual(1, c.Length);
+					var p1 = c[0];
+					Assert.AreEqual("name", p1.Key);
+					Assert.AreEqual("newTest", p1.Value);
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.OK,
+						Response = JToken.Parse(@"{
+		  'error': 'Nothing to do?'
+		}")
+					};
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+
+				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.RenameAsync(null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("newName", exc.ParamName);
+
+				var result = await p.RenameAsync("newTest");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("Nothing to do?", result.Error);
+
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					Assert.AreEqual("PUT", a);
+					Assert.AreEqual("devices/3", b);
+					Assert.AreEqual(1, c.Length);
+					var p1 = c[0];
+					Assert.AreEqual("name", p1.Key);
+					Assert.AreEqual("newTest", p1.Value);
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.OK,
+						Response = JToken.Parse(@"{
+name: 'newTest',
+id: '1234'
+		}")
+					};
+				};
+
+				result = await p.RenameAsync("newTest");
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
 			}

@@ -510,62 +510,92 @@ namespace Particle
 		{
 			var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
 			return result.AsResult();
-			/*@DELETE("/v1/devices/{deviceID}")
-		SimpleResponse unclaimDevice(@Path("deviceID") String deviceID);*/
-			/*{
-	  "ok": true
-	}*/
-			/*
-			{
-		  "error": "Permission Denied",
-		  "info": "I didn't recognize that device name or ID, try opening https://api.particle.io/v1/devices?access_token=..."
-		}
-		*/
 		}
 
-		/*public async Task<Result> RenameAsync()
+		/// <summary>
+		/// Renames the Device.
+		/// </summary>
+		/// <param name="newName">The new name.</param>
+		/// <returns></returns>
+		public async Task<Result> RenameAsync(String newName)
+		{
+			if (String.IsNullOrWhiteSpace(newName))
+			{
+				throw new ArgumentNullException(nameof(newName));
+			}
+
+			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
+			if (result.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var r = result.AsResult();
+				if (String.IsNullOrWhiteSpace(r.Error))
+				{
+					r.Success = true;
+					ParticleCloud.SyncContext.InvokeIfRequired(() =>
+					{
+						Name = newName;
+					});
+				}
+
+				return r;
+			}
+			else
+			{
+				return result.AsResult();
+			}
+			/*
+			@FormUrlEncoded
+		@PUT("/v1/devices/{deviceID}")
+		Response nameDevice(@Path("deviceID") String deviceID,
+							@Field("name") String name);*/
+			/*{
+name: "newTest"
+id: "1234"
+}*/
+			/*
+			{
+			  "error": "Nothing to do?"
+			}*/
+		}
+
+		// this method signature should probably change
+		/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
 		{
 			throw new NotImplementedException();
 		}*/
 
-			// this method signature should probably change
-			/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
-			{
-				throw new NotImplementedException();
-			}*/
+		// this method signature should probably change
+		/*public async Task<Result> FlashKnownAppAsync(String appName)
+		{
+			throw new NotImplementedException();
+		}*/
 
-			// this method signature should probably change
-			/*public async Task<Result> FlashKnownAppAsync(String appName)
-			{
-				throw new NotImplementedException();
-			}*/
+		// this method signature should probably change
+		/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
+		{
+			throw new NotImplementedException();
+		}*/
 
-			// this method signature should probably change
-			/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
-			{
-				throw new NotImplementedException();
-			}*/
+		/*id: "00000"
+name: "Proto"
+last_app: null
+last_ip_address: "174.33.197.239"
+last_heard: "2015-07-11T05:25:09.960Z"
+product_id: 6
+connected: true*/
 
-			/*id: "00000"
-	name: "Proto"
-	last_app: null
-	last_ip_address: "174.33.197.239"
-	last_heard: "2015-07-11T05:25:09.960Z"
-	product_id: 6
-	connected: true*/
-
-			/*
-	id: "00000"
-	name: "Proto"
-	connected: true
-	variables: {
-	temp: "double"
-	}-
-	functions: [1]
-	0:  "led"
-	-
-	cc3000_patch_version: null
-	product_id: 6
-	last_heard: "2015-07-11T05:32:56.614Z"*/
-		}
+		/*
+id: "00000"
+name: "Proto"
+connected: true
+variables: {
+temp: "double"
+}-
+functions: [1]
+0:  "led"
+-
+cc3000_patch_version: null
+product_id: 6
+last_heard: "2015-07-11T05:32:56.614Z"*/
+	}
 	}

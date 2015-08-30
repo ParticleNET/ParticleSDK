@@ -63,6 +63,19 @@ namespace ParticleSDKTests
 			});
 		}
 
+		public override Task<RequestResponse> MakePutRequestAsync(string method, params KeyValuePair<string, string>[] arguments)
+		{
+			return Task.Run<RequestResponse>(() =>
+			{
+				if (RequestCallBack != null)
+				{
+					return RequestCallBack("PUT", method, arguments);
+				}
+
+				throw new NullReferenceException("Please provide a RequestCallBack for this test");
+			});
+		}
+
 		public override Task<RequestResponse> MakeDeleteRequestAsync(string method)
 		{
 			return Task.Run<RequestResponse>(() =>
