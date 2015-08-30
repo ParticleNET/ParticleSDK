@@ -161,7 +161,7 @@ namespace Particle
 		{
 			if (token?.Type == JTokenType.Date)
 			{
-				return token.Value<DateTime>();
+				return token.Value<DateTime>().ToLocalTime();
 			}
 
 			return null;

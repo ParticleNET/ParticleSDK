@@ -60,7 +60,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual("Work", p.Name);
 			Assert.AreEqual("cheese", p.LastApp);
 			Assert.AreEqual("192.168.0.1", p.LastIPAddress);
-			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>(), p.LastHeard);
+			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>().ToLocalTime(), p.LastHeard);
 			Assert.AreEqual(ParticleDeviceType.SparkDeviceTypeCore, p.DeviceType);
 			Assert.IsTrue(p.Connected);
 
@@ -118,7 +118,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual("Work", p.Name);
 			Assert.AreEqual("cheese", p.LastApp);
 			Assert.AreEqual("192.168.0.1", p.LastIPAddress);
-			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>(), p.LastHeard);
+			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>().ToLocalTime(), p.LastHeard);
 			Assert.AreEqual(ParticleDeviceType.SparkDeviceTypeCore, p.DeviceType);
 			Assert.IsTrue(p.Connected);
 
@@ -397,6 +397,18 @@ id: '1234'
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
 				Assert.AreEqual("Update started", result.Message);
+			}
+		}
+
+		[TestMethod]
+		public void LastHeardDateTest()
+		{
+			using (var cloud = new ParticleCloud())
+			{
+				var expected = DateTime.Now;
+				var p = new ParticleDeviceMock(cloud, JObject.Parse($"{{'id':'3', 'name': 'test','last_heard': '{expected.ToUniversalTime():o}'}}"));
+
+				Assert.AreEqual(expected, p.LastHeard);
 			}
 		}
 	}
