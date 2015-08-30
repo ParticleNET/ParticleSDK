@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 Sannel Software, L.L.C.
+Copyright 2015 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,10 +23,19 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// Represents a Device like the Core, Photon or Electron
+	/// </summary>
 	public class ParticleDevice : ParticleBase
 	{
 		private ParticleCloud cloud;
 		private String id;
+		/// <summary>
+		/// Gets the identifier.
+		/// </summary>
+		/// <value>
+		/// The identifier.
+		/// </value>
 		public String Id
 		{
 			get { return id; }
@@ -34,6 +43,12 @@ namespace Particle
 		}
 
 		private String name;
+		/// <summary>
+		/// The name of the core
+		/// </summary>
+		/// <value>
+		/// The name.
+		/// </value>
 		public String Name
 		{
 			get { return name; }
@@ -41,6 +56,12 @@ namespace Particle
 		}
 
 		private String lastApp;
+		/// <summary>
+		/// Gets the last application flashed to the core
+		/// </summary>
+		/// <value>
+		/// The last application.
+		/// </value>
 		public String LastApp
 		{
 			get { return lastApp; }
@@ -48,6 +69,12 @@ namespace Particle
 		}
 
 		private String lastIPAddress;
+		/// <summary>
+		/// Gets the last IP address the Device was connected with
+		/// </summary>
+		/// <value>
+		/// The last IP address.
+		/// </value>
 		public String LastIPAddress
 		{
 			get { return lastIPAddress; }
@@ -55,6 +82,12 @@ namespace Particle
 		}
 
 		private DateTime? lastHeard;
+		/// <summary>
+		/// Gets the last heard date.
+		/// </summary>
+		/// <value>
+		/// The last heard.
+		/// </value>
 		public DateTime? LastHeard
 		{
 			get { return lastHeard; }
@@ -62,6 +95,12 @@ namespace Particle
 		}
 
 		private ParticleDeviceType deviceType;
+		/// <summary>
+		/// Gets the type of the device.
+		/// </summary>
+		/// <value>
+		/// The type of the device.
+		/// </value>
 		public ParticleDeviceType DeviceType
 		{
 			get { return deviceType; }
@@ -69,6 +108,12 @@ namespace Particle
 		}
 
 		private bool connected;
+		/// <summary>
+		/// Gets a value indicating whether this <see cref="ParticleDevice"/> is connected.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if connected; otherwise, <c>false</c>.
+		/// </value>
 		public bool Connected
 		{
 			get { return connected; }
@@ -76,11 +121,23 @@ namespace Particle
 		}
 
 		private ObservableCollection<Variable> variables = new ObservableCollection<Variable>();
+		/// <summary>
+		/// Gets the variables defined for this device. Be sure to call <see cref="RefreshAsync"/> to refresh this list.
+		/// </summary>
+		/// <value>
+		/// The variables.
+		/// </value>
 		public ObservableCollection<Variable> Variables
 		{
 			get { return variables; }
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParticleDevice"/> class.
+		/// </summary>
+		/// <param name="cloud">The cloud.</param>
+		/// <param name="obj">The JSon object to parse</param>
+		/// <exception cref="System.ArgumentNullException"></exception>
 		internal protected ParticleDevice(ParticleCloud cloud, JObject obj)
 		{
 			if (cloud == null)
@@ -104,7 +161,7 @@ namespace Particle
 		{
 			if (token?.Type == JTokenType.Date)
 			{
-				return token.Value<DateTime>();
+				return token.Value<DateTime>().ToLocalTime();
 			}
 
 			return null;
@@ -133,6 +190,10 @@ namespace Particle
 			return false;
 		}
 
+		/// <summary>
+		/// Parses the variables.
+		/// </summary>
+		/// <param name="obj">The object.</param>
 		protected virtual void ParseVariables(JObject obj)
 		{
 			if (obj == null)
@@ -145,7 +206,7 @@ namespace Particle
 			foreach (var prop in obj.Properties())
 			{
 				var first = variables.FirstOrDefault(i => String.Compare(i.Name, prop.Name) == 0);
-				if(first == null)
+				if (first == null)
 				{
 					first = new Variable(this)
 					{
@@ -165,13 +226,17 @@ namespace Particle
 			{
 				variables.Clear();
 
-				foreach(var item in list)
+				foreach (var item in list)
 				{
 					variables.Add(item);
 				}
 			});
 		}
 
+		/// <summary>
+		/// Parses the functions.
+		/// </summary>
+		/// <param name="arr">The arr.</param>
 		protected virtual void ParseFunctions(JArray arr)
 		{
 			if (arr == null)
@@ -193,7 +258,11 @@ namespace Particle
 			});
 		}
 
-		protected virtual void ParseObject(JObject obj)
+		/// <summary>
+		/// Parses the JSon Object representing a particle device
+		/// </summary>
+		/// <param name="obj">The object.</param>
+		protected internal virtual void ParseObject(JObject obj)
 		{
 			if (obj == null)
 			{
@@ -265,6 +334,12 @@ namespace Particle
 		}
 
 		private ObservableCollection<String> functions = new ObservableCollection<string>();
+		/// <summary>
+		/// Gets the functions for this device. Be sure to call <see cref="RefreshAsync"/> to refresh this list.
+		/// </summary>
+		/// <value>
+		/// The functions.
+		/// </value>
 		public IReadOnlyList<String> Functions
 		{
 			get
@@ -273,9 +348,14 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Gets the variable value asynchronous for the provided <paramref name="variable"/> name.
+		/// </summary>
+		/// <param name="variable">The variable.</param>
+		/// <returns></returns>
 		public async Task<Result<Variable>> GetVariableValueAsync(String variable)
 		{
-			if(variable == null)
+			if (variable == null)
 			{
 				throw new ArgumentNullException(nameof(variable));
 			}
@@ -291,10 +371,15 @@ namespace Particle
 			return await GetVariableValueAsync(vari);
 		}
 
+		/// <summary>
+		/// Gets the variable value asynchronous for the provided <paramref name="variable"/>.
+		/// </summary>
+		/// <param name="variable">The variable.</param>
+		/// <returns></returns>
 		public async Task<Result<Variable>> GetVariableValueAsync(Variable variable)
 		{
-			
-			if(variable == null)
+
+			if (variable == null)
 			{
 				throw new ArgumentNullException(nameof(variable));
 			}
@@ -306,7 +391,7 @@ namespace Particle
 
 			var svariable = await Task.Run(() => variables.FirstOrDefault(i => i == variable));
 
-			if(svariable == null)
+			if (svariable == null)
 			{
 				ParticleCloud.SyncContext.InvokeIfRequired(() =>
 				{
@@ -325,7 +410,7 @@ namespace Particle
 				}
 			}
 
-			if(response.StatusCode == System.Net.HttpStatusCode.OK)
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
 			{
 				var tresult = response.Response.SelectToken("result");
 				variable.Value = tresult.Value<Object>().ToString();
@@ -352,16 +437,22 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Calls the function asynchronous.
+		/// </summary>
+		/// <param name="functionName">Name of the function.</param>
+		/// <param name="arg">The argument.</param>
+		/// <returns></returns>
 		public async Task<Result<int>> CallFunctionAsync(String functionName, String arg)
 		{
-			if(String.IsNullOrWhiteSpace(functionName))
+			if (String.IsNullOrWhiteSpace(functionName))
 			{
 				throw new ArgumentNullException(nameof(functionName));
 			}
 
 			var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
 
-			if(response.StatusCode == System.Net.HttpStatusCode.OK)
+			if (response.StatusCode == System.Net.HttpStatusCode.OK)
 			{
 				var returnValue = response.Response.SelectToken("return_value");
 				return new Result<int>(true, (int)returnValue.Value<long>());
@@ -372,6 +463,10 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Refreshes the device from the cloud.
+		/// </summary>
+		/// <returns></returns>
 		public async Task<Result> RefreshAsync()
 		{
 			var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
@@ -407,50 +502,115 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Unclaims the Device asynchronous.
+		/// </summary>
+		/// <returns></returns>
 		public async Task<Result> UnclaimAsync()
 		{
-			throw new NotImplementedException();
+			var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
+			return result.AsResult();
 		}
 
-		public async Task<Result> RenameAsync()
+		/// <summary>
+		/// Renames the Device.
+		/// </summary>
+		/// <param name="newName">The new name.</param>
+		/// <returns></returns>
+		public async Task<Result> RenameAsync(String newName)
 		{
-			throw new NotImplementedException();
+			if (String.IsNullOrWhiteSpace(newName))
+			{
+				throw new ArgumentNullException(nameof(newName));
+			}
+
+			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
+			if (result.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var r = result.AsResult();
+				if (String.IsNullOrWhiteSpace(r.Error))
+				{
+					r.Success = true;
+					ParticleCloud.SyncContext.InvokeIfRequired(() =>
+					{
+						Name = newName;
+					});
+				}
+
+				return r;
+			}
+			else
+			{
+				return result.AsResult();
+			}
 		}
 
-		// this method signature should probably change
-		public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
-		{
-			throw new NotImplementedException();
-		}
-
-		// this method signature should probably change
+		/// <summary>
+		/// Flashes a known application to a device.
+		/// </summary>
+		/// <param name="appName">Name of the application.</param>
+		/// <returns></returns>
 		public async Task<Result> FlashKnownAppAsync(String appName)
 		{
-			throw new NotImplementedException();
+			if (String.IsNullOrWhiteSpace(appName))
+			{
+				throw new ArgumentNullException(nameof(appName));
+			}
+
+			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
+			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+			{
+				var r = result.AsResult();
+				if (String.IsNullOrWhiteSpace(r.Error))
+				{
+					r.Success = true;
+				}
+				return r;
+			}
+			else
+			{
+				return result.AsResult();
+			}
+			/*
+{
+  "id": "310049000647343339373536",
+  "status": "Update started"
+}
+*/
+			/*
+			{
+			  "ok": false,
+			  "code": 500,
+			  "errors": [
+				"Can't flash unknown app tinke"
+			  ]
+			}*/
 		}
 
-		// this method signature should probably change
-		public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
-		{
-			throw new NotImplementedException();
-		}
+					// this method signature should probably change
+					/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
+					{
+						throw new NotImplementedException();
+					}*/
 
-		// this method signature should probably change and its return type will change
-		public async Task<Result> ComplileFilesAsync(IDictionary<String, byte[]> files)
-		{
-			throw new NotImplementedException();
-		}
 
-		/*id: "390032000647343232363230"
-name: "Proto"
-last_app: null
-last_ip_address: "174.52.197.239"
-last_heard: "2015-07-11T05:25:09.960Z"
-product_id: 6
-connected: true*/
+
+			// this method signature should probably change
+			/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
+			{
+				throw new NotImplementedException();
+			}*/
+
+			/*id: "00000"
+	name: "Proto"
+	last_app: null
+	last_ip_address: "174.33.197.239"
+	last_heard: "2015-07-11T05:25:09.960Z"
+	product_id: 6
+	connected: true*/
 
 			/*
-	id: "390032000647343232363230"
+	id: "00000"
 	name: "Proto"
 	connected: true
 	variables: {

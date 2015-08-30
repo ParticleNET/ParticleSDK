@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 Sannel Software, L.L.C.
+Copyright 2015 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,9 +21,22 @@ using System.Threading.Tasks;
 
 namespace Particle
 {
+	/// <summary>
+	/// The type of particle devices
+	/// </summary>
 	public enum ParticleDeviceType
 	{
+		/// <summary>
+		/// The Core
+		/// </summary>
 		SparkDeviceTypeCore = 0,
-		SparkDeviceTypePhoton = 6
+		/// <summary>
+		/// The Photon
+		/// </summary>
+		SparkDeviceTypePhoton = 6,
+		/*
+		Possible devices for the Electron
+		SparkDeviceTypeElectron2G,
+		SparkDeviceTypeElectron3G*/
 	}
 }

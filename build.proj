@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+	<UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll"/>
+	<PropertyGroup>
+		<SDKProject>Particle/Particle.csproj</SDKProject>
+		<TestProject>ParticleSDKTests/ParticleSDKTests.csproj</TestProject>
+		<OutputDir>Build</OutputDir>
+		<TmpDir>Temp</TmpDir>
+	</PropertyGroup>
+
+	<Target Name="Build">
+		<RemoveDir Directories="$(OutputDir)" />
+
+		<MakeDir Directories="$(OutputDir)" />
+		<MakeDir Directories="$(TmpDir)" />
+		<MSBuild Projects="$(SDKProject);" Properties="Configuration=Debug;Platform=Any CPU;OutputPath=..\$(OutputDir);DocumentationFile=..\$(TmpDir)\Particle.xml" /><!-- Generate xml file not sure why it needs to be debug -->
+		<MSBuild Projects="$(SDKProject);" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
+		<MSBuild Projects="$(TestProject)" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
+
+		<Copy SourceFiles="$(TmpDir)\Particle.xml" DestinationFolder="$(OutputDir)" />
+		<RemoveDir Directories="$(TmpDir)" />
+		
+		<Exec Command="mstest.exe /testcontainer:Build\ParticleSDKTests.dll" >
+		</Exec>
+	</Target>
+</Project>
