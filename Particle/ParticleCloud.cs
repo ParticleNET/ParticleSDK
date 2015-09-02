@@ -388,7 +388,10 @@ namespace Particle
 			data["username"] = username;
 			data["password"] = password;
 			data["expires_in"] = expiresIn.ToString();
-			var postResults = await client.PostAsync("/oauth/token", new FormUrlEncodedContent(data));
+			// BaseAddress did not seam to work on linux so changed to use UriBuilder
+			UriBuilder b = new UriBuilder (baseUri);
+			b.Path = "/oauth/token";
+			var postResults = await client.PostAsync(b.Uri, new FormUrlEncodedContent(data));
 			if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
 			{
 				var results = await postResults.Content.ReadAsStringAsync();
