@@ -10,3 +10,6 @@ To install ParticleSDK, run the following command in the [Package Manager Consol
 <code>
 Install-Package ParticleNET.ParticleSDK -Pre
 </code>
+
+## Known Issues with published version
+* Currently login throws an error when running on mono
