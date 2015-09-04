@@ -13,3 +13,12 @@ Install-Package ParticleNET.ParticleSDK -Pre
 
 ## Known Issues with published version
 * Currently login throws an error when running on mono
+
+## Not currently implemented
+* Compiling and flashing files with the cloud
+* Flashing a compiled file
+* Getting a device directly by its id
+* Getting a stream of events
+* Getting a stream of your events
+* Getting a stream of events from a device
+* Publishing an event
