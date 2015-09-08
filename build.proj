@@ -13,14 +13,7 @@
 
 		<MakeDir Directories="$(OutputDir)" />
 		<MakeDir Directories="$(TmpDir)" />
-		<MSBuild Projects="$(SDKProject);" Properties="Configuration=Debug;Platform=Any CPU;OutputPath=..\$(OutputDir);DocumentationFile=..\$(TmpDir)\Particle.xml" /><!-- Generate xml file not sure why it needs to be debug -->
-		<MSBuild Projects="$(SDKProject);" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
-		<MSBuild Projects="$(TestProject)" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
-
-		<Copy SourceFiles="$(TmpDir)\Particle.xml" DestinationFolder="$(OutputDir)" />
-		<RemoveDir Directories="$(TmpDir)" />
-		
-		<Exec Command="mstest.exe /testcontainer:Build\ParticleSDKTests.dll" >
-		</Exec>
+		<MSBuild Projects="$(SDKProject);$(TestProject)" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" StopOnFirstFailure="false" /><!-- Restore nuget packages -->
+		<MSBuild Projects="$(SDKProject);$(TestProject)" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
 	</Target>
 </Project>
