@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/8kcdeffb0s415rmh?svg=true)](https://ci.appveyor.com/project/holtsoftware/particlesdk)
+
 # ParticleSDK
 .NET SDK for Particle.io (formally spark.io)
 
