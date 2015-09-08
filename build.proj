@@ -13,7 +13,7 @@
 
 		<MakeDir Directories="$(OutputDir)" />
 		<MakeDir Directories="$(TmpDir)" />
-		<MSBuild Projects="$(SDKProject);$(TestProject)" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" StopOnFirstFailure="false" /><!-- Restore nuget packages -->
+		<Exec Command="$(MSBuildBinPath)\msbuild.exe ParticleSDK.sln  /noconlog " ContinueOnError="true" /><!-- Restore nuget packages -->
 		<MSBuild Projects="$(SDKProject);$(TestProject)" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
 	</Target>
 </Project>
