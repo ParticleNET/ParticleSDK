@@ -15,23 +15,22 @@ limitations under the License.
  */
 using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Newtonsoft.Json.Linq;
-using Sannel.Helpers;
 using Particle;
 using System.Threading.Tasks;
 
 namespace ParticleSDKTests
 {
-	[TestClass]
+	[TestFixture]
 	public class ParticleDeviceTests
 	{
 
-		[TestMethod]
+		[Test]
 		public void ParseTest()
 		{
 			var p = new ParticleDeviceMock(new JObject());
-			var message = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.ParseObjectMock(null); });
+			var message = Assert.Throws<ArgumentNullException>(() => { p.ParseObjectMock(null); });
 			Assert.AreEqual("obj", message.ParamName);
 
 			var obj = JObject.Parse(@"{'id':'3a', 'name':null}");
@@ -81,7 +80,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual("led2", functions[1]);
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task RefreshAsyncTest()
 		{
 			ParticleCloudMock cloud = new ParticleCloudMock();
@@ -139,7 +138,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual("led2", functions[1]);
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task GetVariableValueAsyncTest()
 		{
 			ParticleCloudMock cloud = new ParticleCloudMock();
@@ -164,9 +163,9 @@ namespace ParticleSDKTests
 
 			var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'variables':{'temp':'int'}}"));
 
-			var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.GetVariableValueAsync((String)null).GetAwaiter().GetResult(); });
+			var ex = Assert.Throws<ArgumentNullException>(() => { p.GetVariableValueAsync((String)null).GetAwaiter().GetResult(); });
 			Assert.AreEqual("variable", ex.ParamName);
-			ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.GetVariableValueAsync((Variable)null).GetAwaiter().GetResult(); });
+			ex = Assert.Throws<ArgumentNullException>(() => { p.GetVariableValueAsync((Variable)null).GetAwaiter().GetResult(); });
 			Assert.AreEqual("variable", ex.ParamName);
 
 			var results = await p.GetVariableValueAsync("temp");
@@ -203,7 +202,7 @@ namespace ParticleSDKTests
 			Assert.AreEqual("23", variable.Value);
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task CallFunctionAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -231,7 +230,7 @@ namespace ParticleSDKTests
 				};
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'functions':['led']}"));
-				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
+				var exc = Assert.Throws<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
 				Assert.AreEqual("functionName", exc.ParamName);
 				var result = await p.CallFunctionAsync("led", "on");
 				Assert.IsTrue(result.Success);
@@ -239,7 +238,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task UnclaimAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -283,7 +282,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task RenameAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -307,7 +306,7 @@ namespace ParticleSDKTests
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
 
-				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.RenameAsync(null).GetAwaiter().GetResult(); });
+				var exc = Assert.Throws<ArgumentNullException>(() => { p.RenameAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("newName", exc.ParamName);
 
 				var result = await p.RenameAsync("newTest");
@@ -339,7 +338,7 @@ id: '1234'
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task FlasyKnownAppAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -367,7 +366,7 @@ id: '1234'
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
 
-				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { p.FlashKnownAppAsync(null).GetAwaiter().GetResult(); });
+				var exc = Assert.Throws<ArgumentNullException>(() => { p.FlashKnownAppAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("appName", exc.ParamName);
 
 				var result = await p.FlashKnownAppAsync("newTest");
@@ -400,7 +399,7 @@ id: '1234'
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public void LastHeardDateTest()
 		{
 			using (var cloud = new ParticleCloud())

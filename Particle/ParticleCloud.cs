@@ -57,31 +57,6 @@ namespace Particle
 			}
 		}
 
-		private bool isRefreshing;
-
-		/// <summary>
-		/// Gets or sets a value indicating whether this instance is refreshing.
-		/// </summary>
-		/// <value>
-		///   <c>true</c> if this device list is refreshing; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsRefreshing
-		{
-			get { return isRefreshing; }
-			protected set { SetProperty(ref isRefreshing, value); }
-		}
-
-		/// <summary>
-		/// Gets the list of devices. Call RefreshDevices to refresh this list.
-		/// </summary>
-		/// <value>
-		/// The devices.
-		/// </value>
-		public ObservableCollection<ParticleDevice> Devices
-		{
-			get;
-		} = new ObservableCollection<ParticleDevice>();
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
 		/// </summary>
@@ -388,7 +363,10 @@ namespace Particle
 			data["username"] = username;
 			data["password"] = password;
 			data["expires_in"] = expiresIn.ToString();
-			var postResults = await client.PostAsync("/oauth/token", new FormUrlEncodedContent(data));
+			// BaseAddress did not seam to work on linux so changed to use UriBuilder
+			UriBuilder b = new UriBuilder (baseUri);
+			b.Path = "/oauth/token";
+			var postResults = await client.PostAsync(b.Uri, new FormUrlEncodedContent(data));
 			if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
 			{
 				var results = await postResults.Content.ReadAsStringAsync();
@@ -496,57 +474,6 @@ namespace Particle
 			else
 			{
 				return response.AsResult<List<ParticleDevice>>();
-			}
-		}
-
-		/// <summary>
-		/// Refreshes the devices list for the logged in user
-		/// </summary>
-		/// <returns></returns>
-		public async Task<Result> RefreshDevicesAsync()
-		{
-			var respose = await MakeGetRequestWithAuthTestAsync("devices");
-
-			if (respose.StatusCode == System.Net.HttpStatusCode.OK)
-			{
-				await Task.Run(() =>
-				{
-					List<String> deviceIds = new List<string>();
-
-					foreach (JObject obj in (JArray)respose.Response)
-					{
-						String id = obj.SelectToken("id").Value<String>();
-						deviceIds.Add(id);
-						var device = Devices.FirstOrDefault(i => String.Compare(i.Id, id) == 0);
-						if (device == null)
-						{
-							device = new ParticleDevice(this, obj);
-							ParticleCloud.SyncContext.InvokeIfRequired(() =>
-							{
-								Devices.Add(device);
-							});
-						}
-						else
-						{
-							device.ParseObject(obj);
-						}
-					}
-
-					var removeDevices = Devices.Where(i => !deviceIds.Contains(i.Id)).ToList();
-					foreach (var rdevice in removeDevices)
-					{
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							Devices.Remove(rdevice);
-						});
-					}
-				});
-
-				return new Result(true);
-			}
-			else
-			{
-				return respose.AsResult();
 			}
 		}
 

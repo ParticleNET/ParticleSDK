@@ -14,27 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Particle;
-using Sannel.Helpers;
-using System.Configuration;
 using System.Threading.Tasks;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using System.Configuration;
 
 namespace ParticleSDKTests
 {
-	[TestClass]
+	[TestFixture]
 	public class ParticleCloudTests
 	{
-		[TestMethod]
+		[Test]
 		public async Task AuthenticationTestAsync()
 		{
 			using (var cloud = new ParticleCloud())
 			{
-				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.LoginWithUserAsync(null, "sadf").GetAwaiter().GetResult(); });
+				var exc = Assert.Throws<ArgumentNullException>(() => { cloud.LoginWithUserAsync(null, "sadf").GetAwaiter().GetResult(); });
 				Assert.AreEqual("username", exc.ParamName);
-				exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.LoginWithUserAsync("test", null).GetAwaiter().GetResult(); });
+				exc = Assert.Throws<ArgumentNullException>(() => { cloud.LoginWithUserAsync("test", null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("password", exc.ParamName);
 
 				var results = await cloud.LoginWithUserAsync("test@test.com", "test123");
@@ -46,14 +45,14 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task MakeGetRequestAsyncTest()
 		{
 			using (var cloud = new ParticleCloud())
 			{
-				var exc = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.MakeGetRequestAsync(null).GetAwaiter().GetResult(); });
+				var exc = Assert.Throws<ArgumentNullException>(() => { cloud.MakeGetRequestAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("method", exc.ParamName);
-				AssertHelpers.ThrowsException<ParticleAuthenticationExeption>(() => { cloud.MakeGetRequestAsync("devices").GetAwaiter().GetResult(); });
+				Assert.Throws<ParticleAuthenticationExeption>(() => { cloud.MakeGetRequestAsync("devices").GetAwaiter().GetResult(); });
 				var stats = await cloud.LoginWithUserAsync(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"]);
 				Assert.IsTrue(stats.Success, "User did not authenticate");
 
@@ -70,7 +69,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task RefreshToken_Test()
 		{
 			using (var cloud = new ParticleCloud())
@@ -87,7 +86,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task GetDevicesAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -147,106 +146,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
-		public async Task RefreshDevicesAsyncTest()
-		{
-			using (var cloud = new ParticleCloudMock())
-			{
-				cloud.RequestCallBack = (t, m, p) =>
-				{
-					return new RequestResponse
-					{
-						StatusCode = HttpStatusCode.OK,
-						Response = JToken.Parse(@"[
-						{
-							""id"": ""1"",
-							""name"": ""Work"",
-							""last_app"": null,
-							""last_ip_address"": ""192.168.0.1"",
-							""last_heard"": ""2015-05-25T01:15:36.034Z"",
-							""product_id"": 0,
-							""connected"": false
-						},
-						{
-							""id"": ""2"",
-							""name"": ""Home"",
-							""last_app"": null,
-							""last_ip_address"": ""192.168.0.1"",
-							""last_heard"": ""2015-05-25T01:15:59.188Z"",
-							""product_id"": 0,
-							""connected"": false
-						},
-						{
-							""id"": ""3"",
-							""name"": ""Proto"",
-							""last_app"": null,
-							""last_ip_address"": ""192.168.0.1"",
-							""last_heard"": ""2015-07-24T00:37:07.820Z"",
-							""product_id"": 6,
-							""connected"": true
-						}
-]")
-					};
-				};
-
-				var result = await cloud.RefreshDevicesAsync();
-				Assert.IsNotNull(result);
-				Assert.IsTrue(result.Success);
-				var devices = cloud.Devices;
-				Assert.AreEqual(3, devices.Count);
-				var device = devices[0];
-				Assert.AreEqual("1", device.Id);
-				Assert.AreEqual("Work", device.Name);
-				device = devices[1];
-				Assert.AreEqual("2", device.Id);
-				Assert.AreEqual("Home", device.Name);
-				device = devices[2];
-				Assert.AreEqual("3", device.Id);
-				Assert.AreEqual("Proto", device.Name);
-
-				cloud.RequestCallBack = (t, m, p) =>
-				{
-					return new RequestResponse
-					{
-						StatusCode = HttpStatusCode.OK,
-						Response = JToken.Parse(@"[
-						{
-							""id"": ""1"",
-							""name"": ""Work"",
-							""last_app"": null,
-							""last_ip_address"": ""192.168.0.1"",
-							""last_heard"": ""2015-05-25T01:15:36.034Z"",
-							""product_id"": 0,
-							""connected"": false
-						},
-						{
-							""id"": ""4"",
-							""name"": ""Home2"",
-							""last_app"": null,
-							""last_ip_address"": ""192.168.0.1"",
-							""last_heard"": ""2015-05-25T01:15:59.188Z"",
-							""product_id"": 0,
-							""connected"": false
-						}
-]")
-					};
-				};
-
-				result = await cloud.RefreshDevicesAsync();
-				Assert.IsNotNull(result);
-				Assert.IsTrue(result.Success);
-				devices = cloud.Devices;
-				Assert.AreEqual(2, devices.Count);
-				device = devices[0];
-				Assert.AreEqual("1", device.Id);
-				Assert.AreEqual("Work", device.Name);
-				device = devices[1];
-				Assert.AreEqual("4", device.Id);
-				Assert.AreEqual("Home2", device.Name);
-			}
-		}
-
-		[TestMethod]
+		[Test]
 		public async Task SignupWithUserAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -264,9 +164,9 @@ namespace ParticleSDKTests
 					};
 				};
 
-				ArgumentNullException e = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.SignupWithUserAsync(null, "test").GetAwaiter().GetResult(); });
+				ArgumentNullException e = Assert.Throws<ArgumentNullException>(() => { cloud.SignupWithUserAsync(null, "test").GetAwaiter().GetResult(); });
 				Assert.AreEqual("username", e.ParamName);
-				e = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.SignupWithUserAsync("test", null).GetAwaiter().GetResult(); });
+				e = Assert.Throws<ArgumentNullException>(() => { cloud.SignupWithUserAsync("test", null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("password", e.ParamName);
 
 				var result = await cloud.SignupWithUserAsync("test", "test");
@@ -292,7 +192,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task RequestPasswordResetAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -310,7 +210,7 @@ namespace ParticleSDKTests
 					};
 				};
 
-				var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.RequestPasswordResetAsync(null).GetAwaiter().GetResult(); });
+				var ex = Assert.Throws<ArgumentNullException>(() => { cloud.RequestPasswordResetAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("email", ex.ParamName);
 
 				var result = await cloud.RequestPasswordResetAsync("test");
@@ -338,7 +238,7 @@ namespace ParticleSDKTests
 			}
 		}
 
-		[TestMethod]
+		[Test]
 		public async Task ClaimDeviceAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -356,7 +256,7 @@ errors: ['device does not exist']
 					};
 				};
 
-				var ex = AssertHelpers.ThrowsException<ArgumentNullException>(() => { cloud.ClaimDeviceAsync(null).GetAwaiter().GetResult(); });
+				var ex = Assert.Throws<ArgumentNullException>(() => { cloud.ClaimDeviceAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("deviceId", ex.ParamName);
 
 				var result = await cloud.ClaimDeviceAsync("123");
