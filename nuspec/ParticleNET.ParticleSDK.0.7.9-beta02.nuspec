@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+    <metadata>
+        <id>ParticleNET.ParticleSDK</id>
+        <version>0.7.9-beta02</version>
+        <title>ParticleSDK</title>
+        <authors>adam holt</authors>
+        <owners>ParticleNET</owners>
+        <licenseUrl>https://github.com/ParticleNET/ParticleSDK/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/ParticleNET/ParticleSDK</projectUrl>
+        <iconUrl>https://github.com/ParticleNET/Particle-Windows-app/blob/develop/Particle-Win8/Particle-Win8.Windows/Assets/SmallLogo.scale-100.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A wrapper around the Particle.io (formaly spark.io) cloud api. Supporting .net 4.5, Windows Runtime 8, and Windows Phone 8.</description>
+        <releaseNotes>Added XML Comments
+ParticleCloud
+- Implemented SignupWithUserAsynd
+- Implemented password reset
+- Implemented ClaimDevice
+- Implemented Devices property and RefreshDevicesAsync method
+ParticleDevice
+- Implemented UnclaimDevice
+- Implemented FlashKnownAppAsync
+- Change LastHeard to be LocalTime instead of Universal Time</releaseNotes>
+        <tags>Spark, Spark.io, Particle, Particle.io</tags>
+        <dependencies>
+            <dependency id="Newtonsoft.Json" version="7.0.1" />
+            <dependency id="Microsoft.Net.Http" version="2.2.29" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\Build\Particle.dll" target="lib\portable-net45+wp80+win8+wpa81\Particle.dll" />
+        <file src="..\Build\Particle.xml" target="lib\portable-net45+wp80+win8+wpa81\Particle.xml" />
+    </files>
+</package>
