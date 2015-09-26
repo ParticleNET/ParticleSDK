@@ -107,6 +107,20 @@ namespace Particle
 			internal set { SetProperty(ref deviceType, value); }
 		}
 
+		private bool isRefreshing;
+		/// <summary>
+		/// Gets or sets a value indicating whether this device is refreshing.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if this device is refreshing; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsRefreshing
+		{
+			get { return isRefreshing; }
+			set { SetProperty(ref isRefreshing, value, nameof(IsRefreshing)); }
+		}
+
+
 		private bool connected;
 		/// <summary>
 		/// Gets a value indicating whether this <see cref="ParticleDevice"/> is connected.
@@ -469,6 +483,7 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result> RefreshAsync()
 		{
+			IsRefreshing = true;
 			var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
 			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 			{
@@ -476,6 +491,7 @@ namespace Particle
 				response = await cloud.MakeGetRequestAsync($"devices/{Id}");
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 				{
+					IsRefreshing = false;
 					return response.AsResult();
 				}
 			}
@@ -485,10 +501,12 @@ namespace Particle
 				if (response.Response?.Type == JTokenType.Object)
 				{
 					await Task.Run(() => ParseObject((JObject)response.Response));
+					IsRefreshing = false;
 					return new Result(true);
 				}
 				else
 				{
+					IsRefreshing = false;
 					return new Result()
 					{
 						Error = Messages.UnexpectedResponse,
@@ -498,6 +516,7 @@ namespace Particle
 			}
 			else
 			{
+				IsRefreshing = false;
 				return response.AsResult();
 			}
 		}
