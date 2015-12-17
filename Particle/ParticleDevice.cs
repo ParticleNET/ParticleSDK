@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Particle
@@ -464,16 +465,28 @@ namespace Particle
 				throw new ArgumentNullException(nameof(functionName));
 			}
 
-			var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
+			try
+			{
+				var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
 
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
-			{
-				var returnValue = response.Response.SelectToken("return_value");
-				return new Result<int>(true, (int)returnValue.Value<long>());
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					var returnValue = response.Response.SelectToken("return_value");
+					return new Result<int>(true, (int)returnValue.Value<long>());
+				}
+				else
+				{
+					return response.AsResult<int>();
+				}
 			}
-			else
+			catch (HttpRequestException re)
 			{
-				return response.AsResult<int>();
+				return new Result<int>
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -577,7 +590,7 @@ namespace Particle
 			}
 
 			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
-			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+			if (result.StatusCode == System.Net.HttpStatusCode.OK)
 			{
 				var r = result.AsResult();
 				if (String.IsNullOrWhiteSpace(r.Error))
@@ -606,40 +619,40 @@ namespace Particle
 			}*/
 		}
 
-					// this method signature should probably change
-					/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
-					{
-						throw new NotImplementedException();
-					}*/
+		// this method signature should probably change
+		/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
+		{
+			throw new NotImplementedException();
+		}*/
 
 
 
-			// this method signature should probably change
-			/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
-			{
-				throw new NotImplementedException();
-			}*/
+		// this method signature should probably change
+		/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
+		{
+			throw new NotImplementedException();
+		}*/
 
-			/*id: "00000"
-	name: "Proto"
-	last_app: null
-	last_ip_address: "174.33.197.239"
-	last_heard: "2015-07-11T05:25:09.960Z"
-	product_id: 6
-	connected: true*/
+		/*id: "00000"
+name: "Proto"
+last_app: null
+last_ip_address: "174.33.197.239"
+last_heard: "2015-07-11T05:25:09.960Z"
+product_id: 6
+connected: true*/
 
-			/*
-	id: "00000"
-	name: "Proto"
-	connected: true
-	variables: {
-	temp: "double"
-	}-
-	functions: [1]
-	0:  "led"
-	-
-	cc3000_patch_version: null
-	product_id: 6
-	last_heard: "2015-07-11T05:32:56.614Z"*/
-		}
+		/*
+id: "00000"
+name: "Proto"
+connected: true
+variables: {
+temp: "double"
+}-
+functions: [1]
+0:  "led"
+-
+cc3000_patch_version: null
+product_id: 6
+last_heard: "2015-07-11T05:32:56.614Z"*/
 	}
+}

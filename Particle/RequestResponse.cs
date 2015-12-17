@@ -45,6 +45,14 @@ namespace Particle
 		public JToken Response { get; set; }
 
 		/// <summary>
+		/// Gets or sets the exception.
+		/// </summary>
+		/// <value>
+		/// The exception.
+		/// </value>
+		public Exception Exception { get; set; }
+
+		/// <summary>
 		/// Converts the JSon response to a Result
 		/// </summary>
 		/// <returns></returns>
