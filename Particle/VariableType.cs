@@ -1,4 +1,5 @@
-﻿/*
+﻿using System;
+/*
 Copyright 2015 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,30 +14,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Particle
 {
 	/// <summary>
-	/// The type of particle devices
+	/// The types of a variable value
 	/// </summary>
-	public enum ParticleDeviceType
+	public enum VariableType
 	{
 		/// <summary>
-		/// The Core
+		/// Integer
 		/// </summary>
-		Core = 0,
+		Int,
 		/// <summary>
-		/// The Photon
+		/// Double
 		/// </summary>
-		Photon = 6,
+		Double,
 		/// <summary>
-		/// The Electron
+		/// String
 		/// </summary>
-		Electron = 10
+		String
 	}
 }

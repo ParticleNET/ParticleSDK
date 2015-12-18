@@ -60,19 +60,19 @@ namespace ParticleSDKTests
 			Assert.AreEqual("cheese", p.LastApp);
 			Assert.AreEqual("192.168.0.1", p.LastIPAddress);
 			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>().ToLocalTime(), p.LastHeard);
-			Assert.AreEqual(ParticleDeviceType.SparkDeviceTypeCore, p.DeviceType);
+			Assert.AreEqual(ParticleDeviceType.Core, p.DeviceType);
 			Assert.IsTrue(p.Connected);
 
 			Assert.AreEqual(3, p.Variables.Count);
 			var variable = p.Variables[0];
 			Assert.AreEqual("temp", variable.Name);
-			Assert.AreEqual("double", variable.Type);
+			Assert.AreEqual(VariableType.Double, variable.Type);
 			variable = p.Variables[1];
 			Assert.AreEqual("temp2", variable.Name);
-			Assert.AreEqual("int", variable.Type);
+			Assert.AreEqual(VariableType.Int, variable.Type);
 			variable = p.Variables[2];
 			Assert.AreEqual("temp3", variable.Name);
-			Assert.AreEqual("string", variable.Type);
+			Assert.AreEqual(VariableType.String, variable.Type);
 
 			var functions = p.Functions;
 			Assert.AreEqual(2, functions.Count);
@@ -118,19 +118,19 @@ namespace ParticleSDKTests
 			Assert.AreEqual("cheese", p.LastApp);
 			Assert.AreEqual("192.168.0.1", p.LastIPAddress);
 			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>().ToLocalTime(), p.LastHeard);
-			Assert.AreEqual(ParticleDeviceType.SparkDeviceTypeCore, p.DeviceType);
+			Assert.AreEqual(ParticleDeviceType.Core, p.DeviceType);
 			Assert.IsTrue(p.Connected);
 
 			Assert.AreEqual(3, p.Variables.Count);
 			var variable = p.Variables[0];
 			Assert.AreEqual("temp", variable.Name);
-			Assert.AreEqual("double", variable.Type);
+			Assert.AreEqual(VariableType.Double, variable.Type);
 			variable = p.Variables[1];
 			Assert.AreEqual("temp2", variable.Name);
-			Assert.AreEqual("int", variable.Type);
+			Assert.AreEqual(VariableType.Int, variable.Type);
 			variable = p.Variables[2];
 			Assert.AreEqual("temp3", variable.Name);
-			Assert.AreEqual("string", variable.Type);
+			Assert.AreEqual(VariableType.String, variable.Type);
 
 			var functions = p.Functions;
 			Assert.AreEqual(2, functions.Count);

@@ -206,6 +206,26 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Gets the type of the variable. if the type does not match a known type returns VariableType.String
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns></returns>
+		private VariableType getVariableType(JToken type)
+		{
+			var t = type?.ToString();
+			if (String.Compare(t, VariableType.Int.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+			{
+				return VariableType.Int;
+			}
+			else if (String.Compare(t, VariableType.Double.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+			{
+				return VariableType.Double;
+			}
+
+			return VariableType.String;
+		}
+
+		/// <summary>
 		/// Parses the variables.
 		/// </summary>
 		/// <param name="obj">The object.</param>
@@ -226,12 +246,12 @@ namespace Particle
 					first = new Variable(this)
 					{
 						Name = prop.Name,
-						Type = prop.Value?.ToString()
+						Type = getVariableType(prop.Value)
 					};
 				}
 				else
 				{
-					first.Type = prop.Value?.ToString();
+					first.Type = getVariableType(prop.Value);
 				}
 
 				list.Add(first);
@@ -322,7 +342,22 @@ namespace Particle
 					case "product_id":
 						ParticleCloud.SyncContext.InvokeIfRequired(() =>
 						{
-							DeviceType = (ParticleDeviceType)parseIntValue(prop.Value);
+							switch (parseIntValue(prop.Value))
+							{
+								case 0:
+									DeviceType = ParticleDeviceType.Core;
+									break;
+
+								case 10:
+									DeviceType = ParticleDeviceType.Electron;
+									break;
+
+								case 5:
+								case 6:
+								default:
+									DeviceType = ParticleDeviceType.Photon;
+									break;
+							}
 						});
 						break;
 					case "connected":
