@@ -13,7 +13,6 @@
 
 		<MakeDir Directories="$(OutputDir)" />
 		<MakeDir Directories="$(TmpDir)" />
-		<Exec Command=".nuget\nuget.exe restore ParticleSDK.sln" ContinueOnError="true" /><!-- Restore nuget packages -->
-		<MSBuild Projects="ParticleSDK.sln" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
+		<MSBuild Projects="ParticleSDK.sln" Properties="RestorePackages=true;Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
 	</Target>
 </Project>
