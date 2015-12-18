@@ -13,6 +13,7 @@
 
 		<MakeDir Directories="$(OutputDir)" />
 		<MakeDir Directories="$(TmpDir)" />
-		<MSBuild Projects="ParticleSDK.sln" Properties="RestorePackages=true;Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
+		<MSBuild Projects="ParticleSDK.sln" Properties="RestorePackages=true;Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" ContinueOnError="true" />
+		<MSBuild Projects="ParticleSDK.sln" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
 	</Target>
 </Project>
