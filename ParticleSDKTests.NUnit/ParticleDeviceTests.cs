@@ -19,6 +19,7 @@ using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Particle;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace ParticleSDKTests
 {
@@ -139,6 +140,26 @@ namespace ParticleSDKTests
 		}
 
 		[Test]
+		public async Task RefreshAsyncHttpRequestExceptionTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Unable to resolve dns");
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					throw ex;
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+				var result = await p.RefreshAsync();
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
+			}
+		}
+
+		[Test]
 		public async Task GetVariableValueAsyncTest()
 		{
 			ParticleCloudMock cloud = new ParticleCloudMock();
@@ -202,6 +223,28 @@ namespace ParticleSDKTests
 			Assert.AreEqual("23", variable.Value);
 		}
 
+
+		[Test]
+		public async Task GetVariableValueAsyncHttpRequestExceptionTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Unable to resolve");
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					throw ex;
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'variables':{'temp':'int'}}"));
+				Assert.IsNotNull(p);
+				var vv = await p.GetVariableValueAsync("Test");
+				Assert.IsNotNull(vv);
+				Assert.IsFalse(vv.Success);
+				Assert.AreEqual(ex.Message, vv.Error);
+				Assert.AreEqual(ex, vv.Exception);
+			}
+		}
+
 		[Test]
 		public async Task CallFunctionAsyncTest()
 		{
@@ -235,6 +278,25 @@ namespace ParticleSDKTests
 				var result = await p.CallFunctionAsync("led", "on");
 				Assert.IsTrue(result.Success);
 				Assert.AreEqual(1, result.Data);
+			}
+		}
+
+		[Test]
+		public async Task CallFunctionAsyncHttpRequestExceptionTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Unable to Resolve");
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					throw ex;
+				};
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'functions':['led']}"));
+				Assert.IsNotNull(p);
+				var cf = await p.CallFunctionAsync("LED", "cheese");
+				Assert.IsNotNull(cf);
+				Assert.AreEqual(ex.Message, cf.Error);
+				Assert.AreEqual(ex, cf.Exception);
 			}
 		}
 
@@ -279,6 +341,28 @@ namespace ParticleSDKTests
 				result = await p.UnclaimAsync();
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
+			}
+		}
+
+
+		[Test]
+		public async Task UnclaimAsyncHttpRequestExceptionTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Unable to resolve");
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					throw ex;
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+
+				var result = await p.UnclaimAsync();
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
 			}
 		}
 
@@ -339,7 +423,27 @@ id: '1234'
 		}
 
 		[Test]
-		public async Task FlasyKnownAppAsyncTest()
+		public async Task RenameAsyncHttpRequestExceptionTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Unable to resolve");
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					throw ex;
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+				var result = await p.RenameAsync("cheese");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
+			}
+		}
+
+		[Test]
+		public async Task FlashKnownAppAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
@@ -396,6 +500,26 @@ id: '1234'
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
 				Assert.AreEqual("Update started", result.Message);
+			}
+		}
+
+		[Test]
+		public async Task FlashKnownAppAsyncHttpRequestExceptionTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Unable to resolve");
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					throw ex;
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+				var result = await p.FlashKnownAppAsync("tinker");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
 			}
 		}
 

@@ -448,42 +448,53 @@ namespace Particle
 					variables.Add(variable);
 				});
 			}
-
-			var response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			try
 			{
-				await cloud.RefreshTokenAsync();
-				response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
+				var response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				{
+					await cloud.RefreshTokenAsync();
+					response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
+					if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					{
+						return response.AsResult<Variable>();
+					}
+				}
+
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					var tresult = response.Response.SelectToken("result");
+					variable.Value = tresult.Value<Object>().ToString();
+					/*
+				"name": "temperature",
+	  "result": 46,
+	  "coreInfo": {
+		"name": "weatherman",
+		"deviceID": "0123456789abcdef01234567",
+		"connected": true,
+		"last_handshake_at": "2015-07-17T22:28:40.907Z",
+		"last_app": ""
+	  }*/
+
+					return new Result<Variable>
+					{
+						Success = true,
+						Data = variable
+					};
+				}
+				else
 				{
 					return response.AsResult<Variable>();
 				}
 			}
-
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			catch(HttpRequestException re)
 			{
-				var tresult = response.Response.SelectToken("result");
-				variable.Value = tresult.Value<Object>().ToString();
-				/*
-			"name": "temperature",
-  "result": 46,
-  "coreInfo": {
-	"name": "weatherman",
-	"deviceID": "0123456789abcdef01234567",
-	"connected": true,
-	"last_handshake_at": "2015-07-17T22:28:40.907Z",
-	"last_app": ""
-  }*/
-
 				return new Result<Variable>
 				{
-					Success = true,
-					Data = variable
+					Success = false,
+					Error = re.Message,
+					Exception = re
 				};
-			}
-			else
-			{
-				return response.AsResult<Variable>();
 			}
 		}
 
@@ -532,40 +543,52 @@ namespace Particle
 		public async Task<Result> RefreshAsync()
 		{
 			IsRefreshing = true;
-			var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			try
 			{
-				await cloud.RefreshTokenAsync();
-				response = await cloud.MakeGetRequestAsync($"devices/{Id}");
+				var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				{
+					await cloud.RefreshTokenAsync();
+					response = await cloud.MakeGetRequestAsync($"devices/{Id}");
+					if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					{
+						IsRefreshing = false;
+						return response.AsResult();
+					}
+				}
+
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					if (response.Response?.Type == JTokenType.Object)
+					{
+						await Task.Run(() => ParseObject((JObject)response.Response));
+						IsRefreshing = false;
+						return new Result(true);
+					}
+					else
+					{
+						IsRefreshing = false;
+						return new Result()
+						{
+							Error = Messages.UnexpectedResponse,
+							ErrorDescription = response.Response?.ToString()
+						};
+					}
+				}
+				else
 				{
 					IsRefreshing = false;
 					return response.AsResult();
 				}
 			}
-
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			catch(HttpRequestException re)
 			{
-				if (response.Response?.Type == JTokenType.Object)
+				return new Result
 				{
-					await Task.Run(() => ParseObject((JObject)response.Response));
-					IsRefreshing = false;
-					return new Result(true);
-				}
-				else
-				{
-					IsRefreshing = false;
-					return new Result()
-					{
-						Error = Messages.UnexpectedResponse,
-						ErrorDescription = response.Response?.ToString()
-					};
-				}
-			}
-			else
-			{
-				IsRefreshing = false;
-				return response.AsResult();
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -575,8 +598,20 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result> UnclaimAsync()
 		{
-			var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
-			return result.AsResult();
+			try
+			{
+				var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
+				return result.AsResult();
+			}
+			catch(HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
 
 		/// <summary>
@@ -591,24 +626,36 @@ namespace Particle
 				throw new ArgumentNullException(nameof(newName));
 			}
 
-			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
-			if (result.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				var r = result.AsResult();
-				if (String.IsNullOrWhiteSpace(r.Error))
+				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
+				if (result.StatusCode == System.Net.HttpStatusCode.OK)
 				{
-					r.Success = true;
-					ParticleCloud.SyncContext.InvokeIfRequired(() =>
+					var r = result.AsResult();
+					if (String.IsNullOrWhiteSpace(r.Error))
 					{
-						Name = newName;
-					});
-				}
+						r.Success = true;
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Name = newName;
+						});
+					}
 
-				return r;
+					return r;
+				}
+				else
+				{
+					return result.AsResult();
+				}
 			}
-			else
+			catch(HttpRequestException re)
 			{
-				return result.AsResult();
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -624,34 +671,32 @@ namespace Particle
 				throw new ArgumentNullException(nameof(appName));
 			}
 
-			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
-			if (result.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				var r = result.AsResult();
-				if (String.IsNullOrWhiteSpace(r.Error))
+				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
+				if (result.StatusCode == System.Net.HttpStatusCode.OK)
 				{
-					r.Success = true;
+					var r = result.AsResult();
+					if (String.IsNullOrWhiteSpace(r.Error))
+					{
+						r.Success = true;
+					}
+					return r;
 				}
-				return r;
+				else
+				{
+					return result.AsResult();
+				}
 			}
-			else
+			catch(HttpRequestException re)
 			{
-				return result.AsResult();
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
-			/*
-{
-  "id": "310049000647343339373536",
-  "status": "Update started"
-}
-*/
-			/*
-			{
-			  "ok": false,
-			  "code": 500,
-			  "errors": [
-				"Can't flash unknown app tinke"
-			  ]
-			}*/
 		}
 
 		// this method signature should probably change
