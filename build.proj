@@ -24,5 +24,6 @@
 
 	<!-- Tell the nuget to create the nuget file for deployment -->
 		<Exec Command=".nuget\nuget.exe pack nuspec\ParticleNET.ParticleSDK.$(BuildVersion).nuspec -OutputDirectory $(OutputDir)" />
+		<Exec Command=".nuget\nuget.exe push $(OutputDir)\ParticleNET.ParticleSDK.$(BuildVersion).nupkg" />
 	</Target>
 </Project>
