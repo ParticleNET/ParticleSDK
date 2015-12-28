@@ -1,4 +1,6 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8kcdeffb0s415rmh?svg=true)](https://ci.appveyor.com/project/holtsoftware/particlesdk)
+| master | develop |
+|--------|---------|
+|[![Build status](https://ci.appveyor.com/api/projects/status/8kcdeffb0s415rmh?svg=true)](https://ci.appveyor.com/project/holtsoftware/particlesdk)|[![Build status](https://ci.appveyor.com/api/projects/status/3oa42ovdknh4i627?svg=true)](https://ci.appveyor.com/project/holtsoftware/particlesdk-qe393)|
 
 # ParticleSDK
 .NET SDK for Particle.io (formally spark.io)

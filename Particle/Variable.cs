@@ -50,14 +50,14 @@ namespace Particle
 			internal set { SetProperty(ref name, value); }
 		}
 
-		private String type;
+		private VariableType type;
 		/// <summary>
 		/// Gets the type of the variable
 		/// </summary>
 		/// <value>
 		/// The type.
 		/// </value>
-		public String Type
+		public VariableType Type
 		{
 			get { return type; }
 			internal set { SetProperty(ref type, value); }

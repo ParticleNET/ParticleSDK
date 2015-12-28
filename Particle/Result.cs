@@ -175,6 +175,17 @@ namespace Particle
 		/// </value>
 		[JsonProperty("errors")]
 		public List<String> Errors { get; private set; } = new List<string>();
+
+		/// <summary>
+		/// Gets or sets the error exception.
+		/// 
+		/// When an exception is caught in this library it will be placed in here so you can inspect it more if you want to.
+		/// </summary>
+		/// <value>
+		/// The error exception.
+		/// </value>
+		[JsonIgnore]
+		public Exception Exception { get; set; }
 	}
 
 	/// <summary>
