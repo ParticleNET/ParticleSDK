@@ -17,8 +17,8 @@
 		<MakeDir Directories="$(TmpDir)" />
 		<AssemblyInfo CodeLanguage="CS"
 			OutputFile="Particle\Properties\AssemblyVersion.cs"
-			AssemblyVersion="$(APPVEYOR_BUILD_VERSION).$(APPVEYOR_JOB_ID)"
-			AssemblyFileVersion="$(APPVEYOR_BUILD_VERSION).$(APPVEYOR_JOB_ID)" />
+			AssemblyVersion="$(APPVEYOR_BUILD_VERSION).8"
+			AssemblyFileVersion="$(APPVEYOR_BUILD_VERSION).8" />
 		<Exec Command=".nuget\nuget.exe restore ParticleSDK.sln" ContinueOnError="true" /><!-- Restore nuget packages -->
 		<MSBuild Projects="ParticleSDK.sln" Properties="Configuration=Release;Platform=Any CPU;OutputPath=..\$(OutputDir);" />
 	<!-- Copy Nuget spec file to current version build version -->
