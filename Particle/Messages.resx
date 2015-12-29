@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ErrorRetreavingDeviceInfoForDevice" xml:space="preserve">
-    <value>Error retreaving Device Info for device {0}</value>
+    <value>Error retrieving Device Info for device {0}</value>
   </data>
   <data name="ErrorRetrevingDevices" xml:space="preserve">
-    <value>Error retreving devices</value>
+    <value>Error retrieving devices</value>
   </data>
   <data name="PleaseLoginAgain" xml:space="preserve">
     <value>Please Login Again</value>

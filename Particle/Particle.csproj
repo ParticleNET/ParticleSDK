@@ -40,6 +40,7 @@
     <DocumentationFile>bin\Release\Particle.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Messages.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -84,6 +85,7 @@
     <EmbeddedResource Include="Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
   </ItemGroup>

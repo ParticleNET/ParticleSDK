@@ -62,7 +62,7 @@ namespace Particle {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error retreaving Device Info for device {0}.
+        ///   Looks up a localized string similar to Error retrieving Device Info for device {0}.
         /// </summary>
         internal static string ErrorRetreavingDeviceInfoForDevice {
             get {
@@ -71,7 +71,7 @@ namespace Particle {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error retreving devices.
+        ///   Looks up a localized string similar to Error retrieving devices.
         /// </summary>
         internal static string ErrorRetrevingDevices {
             get {

@@ -363,7 +363,7 @@ namespace Particle
 			data["username"] = username;
 			data["password"] = password;
 			data["expires_in"] = expiresIn.ToString();
-			// BaseAddress did not seam to work on linux so changed to use UriBuilder
+			// BaseAddress did not seam to work on Linux so changed to use UriBuilder
 			UriBuilder b = new UriBuilder(baseUri);
 			b.Path = "/oauth/token";
 			try
