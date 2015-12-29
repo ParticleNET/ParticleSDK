@@ -25,7 +25,7 @@ ParticleDevice
 - Change LastHeard to be LocalTime instead of Universal Time
 
 Added Exception Handling for HttpRequestException. All results will now return Success of false and Exception being filled out with that exception
-Electron Device id to Device Types
+Added Electron Device id to Device Types
 		</releaseNotes>
 		<tags>Spark, Spark.io, Particle, Particle.io</tags>
 		<dependencies>
