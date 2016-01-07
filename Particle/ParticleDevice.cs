@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 ParticleNET
+Copyright 2016 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Particle
@@ -107,6 +108,20 @@ namespace Particle
 			internal set { SetProperty(ref deviceType, value); }
 		}
 
+		private bool isRefreshing;
+		/// <summary>
+		/// Gets or sets a value indicating whether this device is refreshing.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if this device is refreshing; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsRefreshing
+		{
+			get { return isRefreshing; }
+			set { SetProperty(ref isRefreshing, value, nameof(IsRefreshing)); }
+		}
+
+
 		private bool connected;
 		/// <summary>
 		/// Gets a value indicating whether this <see cref="ParticleDevice"/> is connected.
@@ -191,6 +206,26 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Gets the type of the variable. if the type does not match a known type returns VariableType.String
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns></returns>
+		private VariableType getVariableType(JToken type)
+		{
+			var t = type?.ToString();
+			if (String.Compare(t, VariableType.Int.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+			{
+				return VariableType.Int;
+			}
+			else if (String.Compare(t, VariableType.Double.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+			{
+				return VariableType.Double;
+			}
+
+			return VariableType.String;
+		}
+
+		/// <summary>
 		/// Parses the variables.
 		/// </summary>
 		/// <param name="obj">The object.</param>
@@ -211,12 +246,12 @@ namespace Particle
 					first = new Variable(this)
 					{
 						Name = prop.Name,
-						Type = prop.Value?.ToString()
+						Type = getVariableType(prop.Value)
 					};
 				}
 				else
 				{
-					first.Type = prop.Value?.ToString();
+					first.Type = getVariableType(prop.Value);
 				}
 
 				list.Add(first);
@@ -307,7 +342,22 @@ namespace Particle
 					case "product_id":
 						ParticleCloud.SyncContext.InvokeIfRequired(() =>
 						{
-							DeviceType = (ParticleDeviceType)parseIntValue(prop.Value);
+							switch (parseIntValue(prop.Value))
+							{
+								case 0:
+									DeviceType = ParticleDeviceType.Core;
+									break;
+
+								case 10:
+									DeviceType = ParticleDeviceType.Electron;
+									break;
+
+								case 5:
+								case 6:
+								default:
+									DeviceType = ParticleDeviceType.Photon;
+									break;
+							}
 						});
 						break;
 					case "connected":
@@ -398,42 +448,53 @@ namespace Particle
 					variables.Add(variable);
 				});
 			}
-
-			var response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			try
 			{
-				await cloud.RefreshTokenAsync();
-				response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
+				var response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				{
+					await cloud.RefreshTokenAsync();
+					response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
+					if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					{
+						return response.AsResult<Variable>();
+					}
+				}
+
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					var tresult = response.Response.SelectToken("result");
+					variable.Value = tresult.Value<Object>().ToString();
+					/*
+				"name": "temperature",
+	  "result": 46,
+	  "coreInfo": {
+		"name": "weatherman",
+		"deviceID": "0123456789abcdef01234567",
+		"connected": true,
+		"last_handshake_at": "2015-07-17T22:28:40.907Z",
+		"last_app": ""
+	  }*/
+
+					return new Result<Variable>
+					{
+						Success = true,
+						Data = variable
+					};
+				}
+				else
 				{
 					return response.AsResult<Variable>();
 				}
 			}
-
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			catch(HttpRequestException re)
 			{
-				var tresult = response.Response.SelectToken("result");
-				variable.Value = tresult.Value<Object>().ToString();
-				/*
-			"name": "temperature",
-  "result": 46,
-  "coreInfo": {
-	"name": "weatherman",
-	"deviceID": "0123456789abcdef01234567",
-	"connected": true,
-	"last_handshake_at": "2015-07-17T22:28:40.907Z",
-	"last_app": ""
-  }*/
-
 				return new Result<Variable>
 				{
-					Success = true,
-					Data = variable
+					Success = false,
+					Error = re.Message,
+					Exception = re
 				};
-			}
-			else
-			{
-				return response.AsResult<Variable>();
 			}
 		}
 
@@ -450,16 +511,28 @@ namespace Particle
 				throw new ArgumentNullException(nameof(functionName));
 			}
 
-			var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
+			try
+			{
+				var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
 
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
-			{
-				var returnValue = response.Response.SelectToken("return_value");
-				return new Result<int>(true, (int)returnValue.Value<long>());
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					var returnValue = response.Response.SelectToken("return_value");
+					return new Result<int>(true, (int)returnValue.Value<long>());
+				}
+				else
+				{
+					return response.AsResult<int>();
+				}
 			}
-			else
+			catch (HttpRequestException re)
 			{
-				return response.AsResult<int>();
+				return new Result<int>
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -469,36 +542,53 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result> RefreshAsync()
 		{
-			var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			IsRefreshing = true;
+			try
 			{
-				await cloud.RefreshTokenAsync();
-				response = await cloud.MakeGetRequestAsync($"devices/{Id}");
+				var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
 				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
 				{
-					return response.AsResult();
+					await cloud.RefreshTokenAsync();
+					response = await cloud.MakeGetRequestAsync($"devices/{Id}");
+					if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					{
+						IsRefreshing = false;
+						return response.AsResult();
+					}
 				}
-			}
 
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
-			{
-				if (response.Response?.Type == JTokenType.Object)
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
 				{
-					await Task.Run(() => ParseObject((JObject)response.Response));
-					return new Result(true);
+					if (response.Response?.Type == JTokenType.Object)
+					{
+						await Task.Run(() => ParseObject((JObject)response.Response));
+						IsRefreshing = false;
+						return new Result(true);
+					}
+					else
+					{
+						IsRefreshing = false;
+						return new Result()
+						{
+							Error = Messages.UnexpectedResponse,
+							ErrorDescription = response.Response?.ToString()
+						};
+					}
 				}
 				else
 				{
-					return new Result()
-					{
-						Error = Messages.UnexpectedResponse,
-						ErrorDescription = response.Response?.ToString()
-					};
+					IsRefreshing = false;
+					return response.AsResult();
 				}
 			}
-			else
+			catch(HttpRequestException re)
 			{
-				return response.AsResult();
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -508,8 +598,20 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result> UnclaimAsync()
 		{
-			var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
-			return result.AsResult();
+			try
+			{
+				var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
+				return result.AsResult();
+			}
+			catch(HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
 
 		/// <summary>
@@ -524,24 +626,36 @@ namespace Particle
 				throw new ArgumentNullException(nameof(newName));
 			}
 
-			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
-			if (result.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				var r = result.AsResult();
-				if (String.IsNullOrWhiteSpace(r.Error))
+				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
+				if (result.StatusCode == System.Net.HttpStatusCode.OK)
 				{
-					r.Success = true;
-					ParticleCloud.SyncContext.InvokeIfRequired(() =>
+					var r = result.AsResult();
+					if (String.IsNullOrWhiteSpace(r.Error))
 					{
-						Name = newName;
-					});
-				}
+						r.Success = true;
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Name = newName;
+						});
+					}
 
-				return r;
+					return r;
+				}
+				else
+				{
+					return result.AsResult();
+				}
 			}
-			else
+			catch(HttpRequestException re)
 			{
-				return result.AsResult();
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -557,70 +671,68 @@ namespace Particle
 				throw new ArgumentNullException(nameof(appName));
 			}
 
-			var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
-			if(result.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				var r = result.AsResult();
-				if (String.IsNullOrWhiteSpace(r.Error))
+				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
+				if (result.StatusCode == System.Net.HttpStatusCode.OK)
 				{
-					r.Success = true;
-				}
-				return r;
-			}
-			else
-			{
-				return result.AsResult();
-			}
-			/*
-{
-  "id": "310049000647343339373536",
-  "status": "Update started"
-}
-*/
-			/*
-			{
-			  "ok": false,
-			  "code": 500,
-			  "errors": [
-				"Can't flash unknown app tinke"
-			  ]
-			}*/
-		}
-
-					// this method signature should probably change
-					/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
+					var r = result.AsResult();
+					if (String.IsNullOrWhiteSpace(r.Error))
 					{
-						throw new NotImplementedException();
-					}*/
-
-
-
-			// this method signature should probably change
-			/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
+						r.Success = true;
+					}
+					return r;
+				}
+				else
+				{
+					return result.AsResult();
+				}
+			}
+			catch(HttpRequestException re)
 			{
-				throw new NotImplementedException();
-			}*/
-
-			/*id: "00000"
-	name: "Proto"
-	last_app: null
-	last_ip_address: "174.33.197.239"
-	last_heard: "2015-07-11T05:25:09.960Z"
-	product_id: 6
-	connected: true*/
-
-			/*
-	id: "00000"
-	name: "Proto"
-	connected: true
-	variables: {
-	temp: "double"
-	}-
-	functions: [1]
-	0:  "led"
-	-
-	cc3000_patch_version: null
-	product_id: 6
-	last_heard: "2015-07-11T05:32:56.614Z"*/
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
+
+		// this method signature should probably change
+		/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
+		{
+			throw new NotImplementedException();
+		}*/
+
+
+
+		// this method signature should probably change
+		/*public async Task<Result> CompileAndFlashFiles(IDictionary<String, byte[]> files)
+		{
+			throw new NotImplementedException();
+		}*/
+
+		/*id: "00000"
+name: "Proto"
+last_app: null
+last_ip_address: "174.33.197.239"
+last_heard: "2015-07-11T05:25:09.960Z"
+product_id: 6
+connected: true*/
+
+		/*
+id: "00000"
+name: "Proto"
+connected: true
+variables: {
+temp: "double"
+}-
+functions: [1]
+0:  "led"
+-
+cc3000_patch_version: null
+product_id: 6
+last_heard: "2015-07-11T05:32:56.614Z"*/
 	}
+}

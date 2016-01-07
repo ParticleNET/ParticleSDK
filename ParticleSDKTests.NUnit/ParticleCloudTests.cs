@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 ParticleNET
+Copyright 2016 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System.Configuration;
+using System.Net.Http;
 
 namespace ParticleSDKTests
 {
@@ -42,6 +43,18 @@ namespace ParticleSDKTests
 
 				results = await cloud.LoginWithUserAsync(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"]);
 				Assert.IsTrue(results.Success, "User did not authenticate");
+			}
+		}
+
+		[Test]
+		public async Task AuthenticationAsyncHttpRequestExceptionTest()
+		{
+			using (var cloud = new ParticleCloud(new Uri("http://particletest.io")))
+			{
+				var result = await cloud.LoginWithUserAsync("test", "test");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("An error occurred while sending the request.", result.Error);
 			}
 		}
 
@@ -146,6 +159,26 @@ namespace ParticleSDKTests
 			}
 		}
 
+
+		[Test]
+		public async Task GetDevicesAsyncHttpRequestExceptionTest()
+		{
+			using(var cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Error connecting to the server");
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					throw ex;
+				};
+
+				var result = await cloud.GetDevicesAsync();
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
+			}
+		}
+
 		[Test]
 		public async Task SignupWithUserAsyncTest()
 		{
@@ -189,6 +222,25 @@ namespace ParticleSDKTests
 				result = await cloud.SignupWithUserAsync("test@test.com", "test");
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
+			}
+		}
+
+		[Test]
+		public async Task SignupWithUserAsyncHttpRequestExceptionTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Error Connecting to Server");
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					throw ex;
+				};
+
+				var result = await cloud.SignupWithUserAsync("Test", "test");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
 			}
 		}
 
@@ -239,6 +291,24 @@ namespace ParticleSDKTests
 		}
 
 		[Test]
+		public async Task RequestPasswordResetAsyncHttpRequestExceptionTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Error connecting to server");
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					throw ex;
+				};
+				var result = await cloud.RequestPasswordResetAsync("test");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
+			}
+		}
+
+		[Test]
 		public async Task ClaimDeviceAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -282,6 +352,26 @@ errors: ['device does not exist']
 				result = await cloud.ClaimDeviceAsync("222222222222222222222222");
 				Assert.IsNotNull(result);
 				Assert.IsTrue(result.Success);
+			}
+		}
+
+		[Test]
+		public async Task ClaimDeviceAsyncHttpRequestExceptionTest()
+		{
+			using (var cloud = new ParticleCloudMock())
+			{
+				var ex = new HttpRequestException("Text HttpClient Request Exception");
+				cloud.RequestCallBack = (t, m, p) =>
+				{
+					throw ex;
+					//return new RequestResponse();
+				};
+
+				var result = await cloud.ClaimDeviceAsync("123");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual(ex.Message, result.Error);
+				Assert.AreEqual(ex, result.Exception);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 ParticleNET
+Copyright 2016 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,6 +43,14 @@ namespace Particle
 		/// The response.
 		/// </value>
 		public JToken Response { get; set; }
+
+		/// <summary>
+		/// Gets or sets the exception.
+		/// </summary>
+		/// <value>
+		/// The exception.
+		/// </value>
+		public Exception Exception { get; set; }
 
 		/// <summary>
 		/// Converts the JSon response to a Result

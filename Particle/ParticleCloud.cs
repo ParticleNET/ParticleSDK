@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 ParticleNET
+Copyright 2016 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -363,44 +363,56 @@ namespace Particle
 			data["username"] = username;
 			data["password"] = password;
 			data["expires_in"] = expiresIn.ToString();
-			// BaseAddress did not seam to work on linux so changed to use UriBuilder
-			UriBuilder b = new UriBuilder (baseUri);
+			// BaseAddress did not seam to work on Linux so changed to use UriBuilder
+			UriBuilder b = new UriBuilder(baseUri);
 			b.Path = "/oauth/token";
-			var postResults = await client.PostAsync(b.Uri, new FormUrlEncodedContent(data));
-			if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				var results = await postResults.Content.ReadAsStringAsync();
-				var ret = await Task.Run(() => JsonConvert.DeserializeObject<AuthenticationResults>(results));
-				if (ret != null)
+				var postResults = await client.PostAsync(b.Uri, new FormUrlEncodedContent(data));
+				if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
 				{
-					if (!String.IsNullOrWhiteSpace(ret.AccessToken))
+					var results = await postResults.Content.ReadAsStringAsync();
+					var ret = await Task.Run(() => JsonConvert.DeserializeObject<AuthenticationResults>(results));
+					if (ret != null)
 					{
-						authResults = ret;
-						authResults.Username = username;
-						authResults.Password = password;
-						return new Result
+						if (!String.IsNullOrWhiteSpace(ret.AccessToken))
 						{
-							Success = true
-						};
+							authResults = ret;
+							authResults.Username = username;
+							authResults.Password = password;
+							return new Result
+							{
+								Success = true
+							};
+						}
 					}
 				}
-			}
-			else if (postResults.StatusCode == System.Net.HttpStatusCode.BadRequest)
-			{
-				var results = await postResults.Content.ReadAsStringAsync();
-				var ret = await Task.Run(() => JsonConvert.DeserializeObject<Result>(results));
-				if (ret != null)
+				else if (postResults.StatusCode == System.Net.HttpStatusCode.BadRequest)
 				{
-					ret.Success = false;
-					return ret;
+					var results = await postResults.Content.ReadAsStringAsync();
+					var ret = await Task.Run(() => JsonConvert.DeserializeObject<Result>(results));
+					if (ret != null)
+					{
+						ret.Success = false;
+						return ret;
+					}
 				}
-			}
 
-			return new Result
+				return new Result
+				{
+					Success = false,
+					Error = postResults.StatusCode.ToString()
+				};
+			}
+			catch (HttpRequestException re)
 			{
-				Success = false,
-				Error = postResults.StatusCode.ToString()
-			};
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
 
 		/// <summary>
@@ -420,9 +432,21 @@ namespace Particle
 				throw new ArgumentNullException(nameof(password));
 			}
 
-			var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
+			try
+			{
+				var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
 
-			return result.AsResult();
+				return result.AsResult();
+			}
+			catch (HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
 
 		/// <summary>
@@ -437,9 +461,21 @@ namespace Particle
 				throw new ArgumentNullException(nameof(email));
 			}
 
-			var result = await MakePostRequestAsync("user/password-reset", new KeyValuePair<string, string>("username", email));
+			try
+			{
+				var result = await MakePostRequestAsync("user/password-reset", new KeyValuePair<string, string>("username", email));
 
-			return result.AsResult();
+				return result.AsResult();
+			}
+			catch (HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
 
 		/// <summary>
@@ -456,24 +492,35 @@ namespace Particle
 		/// <returns></returns>
 		public async Task<Result<List<ParticleDevice>>> GetDevicesAsync()
 		{
-			var response = await MakeGetRequestWithAuthTestAsync("devices");
-
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				List<ParticleDevice> items = new List<ParticleDevice>();
-				await Task.Run(() =>
-					{
-						foreach (JObject obj in (JArray)response.Response)
+				var response = await MakeGetRequestWithAuthTestAsync("devices");
+
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					List<ParticleDevice> items = new List<ParticleDevice>();
+					await Task.Run(() =>
 						{
-							items.Add(new ParticleDevice(this, obj));
-						}
-					});
+							foreach (JObject obj in (JArray)response.Response)
+							{
+								items.Add(new ParticleDevice(this, obj));
+							}
+						});
 
-				return new Result<List<ParticleDevice>>(true, items);
+					return new Result<List<ParticleDevice>>(true, items);
+				}
+				else
+				{
+					return response.AsResult<List<ParticleDevice>>();
+				}
 			}
-			else
+			catch (HttpRequestException re)
 			{
-				return response.AsResult<List<ParticleDevice>>();
+				return new Result<List<ParticleDevice>>(false, new List<ParticleDevice>())
+				{
+					Error = re.Message,
+					Exception = re
+				};
 			}
 		}
 
@@ -519,9 +566,21 @@ namespace Particle
 				throw new ArgumentNullException(nameof(deviceId));
 			}
 
-			var result = await MakePostRequestWithAuthTestAsync("devices", new KeyValuePair<string, string>("id", deviceId));
-			var userResult = result.AsResult();
-			return userResult;
+			try
+			{
+				var result = await MakePostRequestWithAuthTestAsync("devices", new KeyValuePair<string, string>("id", deviceId));
+				var userResult = result.AsResult();
+				return userResult;
+			}
+			catch (HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
 		}
 
 		// <summary>

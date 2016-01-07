@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 ParticleNET
+Copyright 2016 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -175,6 +175,17 @@ namespace Particle
 		/// </value>
 		[JsonProperty("errors")]
 		public List<String> Errors { get; private set; } = new List<string>();
+
+		/// <summary>
+		/// Gets or sets the error exception.
+		/// 
+		/// When an exception is caught in this library it will be placed in here so you can inspect it more if you want to.
+		/// </summary>
+		/// <value>
+		/// The error exception.
+		/// </value>
+		[JsonIgnore]
+		public Exception Exception { get; set; }
 	}
 
 	/// <summary>

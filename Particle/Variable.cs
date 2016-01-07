@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2015 ParticleNET
+Copyright 2016 ParticleNET
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,14 +50,14 @@ namespace Particle
 			internal set { SetProperty(ref name, value); }
 		}
 
-		private String type;
+		private VariableType type;
 		/// <summary>
 		/// Gets the type of the variable
 		/// </summary>
 		/// <value>
 		/// The type.
 		/// </value>
-		public String Type
+		public VariableType Type
 		{
 			get { return type; }
 			internal set { SetProperty(ref type, value); }
