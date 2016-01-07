@@ -8,9 +8,9 @@
 		<owners>ParticleNET</owners>
 		<licenseUrl>https://github.com/ParticleNET/ParticleSDK/blob/master/LICENSE</licenseUrl>
 		<projectUrl>https://github.com/ParticleNET/ParticleSDK</projectUrl>
-		<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
+		<iconUrl>https://raw.githubusercontent.com/ParticleNET/ParticleSDK/master/nuspec/icon.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>A wrapper around the Particle.io (formaly spark.io) cloud api. Supporting .net 4.5, Windows Runtime 8, and Windows Phone 8.</description>
+		<description>A wrapper around the Particle.io (formally spark.io) cloud api. Supporting .net 4.5, Windows Runtime 8, and Windows Phone 8.</description>
 		<releaseNotes>
 Added XML Comments
 ParticleCloud
@@ -27,7 +27,7 @@ ParticleDevice
 Added Exception Handling for HttpRequestException. All results will now return Success of false and Exception being filled out with that exception
 Added Electron Device id to Device Types
 		</releaseNotes>
-		<tags>Spark, Spark.io, Particle, Particle.io</tags>
+		<tags>Spark, Spark.io, Particle, Particle.io, ParticleNET</tags>
 		<dependencies>
 			<dependency id="Newtonsoft.Json" version="7.0.1" />
 			<dependency id="Microsoft.Net.Http" version="2.2.29" />
