@@ -14,7 +14,7 @@ The example app will be an implementation of the Tinker App for WP 8.1, Windows 
 ## Adding to your project
 To install ParticleSDK, run the following command in the [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console)<br />
 <code>
-Install-Package ParticleNET.ParticleSDK -Pre
+Install-Package ParticleNET.ParticleSDK
 </code>
 
 ## Not currently implemented
