@@ -412,6 +412,7 @@ namespace Particle
 							authResults = ret;
 							authResults.Username = username;
 							authResults.Password = password;
+							FirePropertyChanged(nameof(IsAuthenticated));
 							return new Result
 							{
 								Success = true
@@ -516,6 +517,7 @@ namespace Particle
 		public void Logout()
 		{
 			authResults = null;
+			FirePropertyChanged(nameof(IsAuthenticated));
 		}
 
 		/// <summary>

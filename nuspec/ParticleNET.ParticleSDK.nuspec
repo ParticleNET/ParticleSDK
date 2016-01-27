@@ -12,7 +12,10 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>A wrapper around the Particle.io (formally spark.io) cloud api. Supporting .net 4.5, Windows Runtime 8, and Windows Phone 8.</description>
 		<releaseNotes>
-0.8.2-beta
+0.8.4-beta
+-Updated Login and Logout to fire a change notification to IsAuthenticated
+
+0.8.3-beta
 Bug Fixes
 -Fixed Bug with Registration that required user to be logged in first.
 
