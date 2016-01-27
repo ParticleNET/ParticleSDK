@@ -466,7 +466,7 @@ namespace Particle
 
 			try
 			{
-				var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
+				var result = await MakePostRequestWithoutAuthAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
 
 				return result.AsResult();
 			}
