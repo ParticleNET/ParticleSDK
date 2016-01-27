@@ -124,6 +124,38 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Makes the post request without authentication asynchronous to the particle cloud.
+		/// </summary>
+		/// <param name="method">The method.</param>
+		/// <param name="arguments">The arguments.</param>
+		/// <returns>The Results of the request</returns>
+		public virtual async Task<RequestResponse> MakePostRequestWithoutAuthAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+
+			HttpResponseMessage response;
+			if (arguments != null)
+			{
+				response = await client.PostAsync(method, new FormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PostAsync(method, null);
+			}
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
+		}
+
+		/// <summary>
 		/// Makes the post request asynchronous to the particle cloud
 		/// </summary>
 		/// <param name="method">The method to call</param>
