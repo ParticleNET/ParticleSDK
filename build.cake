@@ -9,6 +9,7 @@ Task("AppVeyorUpdate")
 	if(AppVeyor.IsRunningOnAppVeyor)
 	{
 		Information("Building on AppVeyor");
+		buildVersion = AppVeyor.Environment.Build.Version;
 	}
 	else
 	{
