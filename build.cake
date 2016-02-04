@@ -90,7 +90,10 @@ Task("SignAssembly")
 Task("NUnitTests")
 	.Does(() =>
 {
-	NUnit3(GetFiles(String.Format("{0}\\*Tests*.dll", outputDirectory)));
+	NUnit3(GetFiles(String.Format("{0}\\*Tests*.dll", outputDirectory)), new NUnit3Settings()
+	{
+		Results = String.Format("{0}\\TestResults.xml", outputDirectory)
+	});
 });
 
 Task("NuGetPack")
@@ -127,7 +130,6 @@ Task("Default")
 	.IsDependentOn("Build")
 	.IsDependentOn("SignAssembly")
 	.IsDependentOn("NUnitTests")
-	.IsDependentOn("NuGetPack")
-	.IsDependentOn("AppVeyorArtifact");
+	.IsDependentOn("NuGetPack");
 
 RunTarget(target);
