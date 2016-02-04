@@ -10,6 +10,7 @@ Task("AppVeyorUpdate")
 	{
 		Information("Building on AppVeyor");
 		buildVersion = AppVeyor.Environment.Build.Version;
+		Information("Build Version is {0}", buildVersion);
 	}
 	else
 	{
@@ -114,7 +115,11 @@ Task("AppVeyorArtifact")
 {
 	if(AppVeyor.IsRunningOnAppVeyor)
 	{
-		AppVeyor.UploadArtifact(String.Format("{0}\\ParticleNET.*.nupkg"));
+		var files = GetFiles(String.Format("{0}\\ParticleNET.*.nupkg"));
+		foreach(var f in files)
+		{
+			AppVeyor.UploadArtifact(f);
+		}
 	}
 });
 
