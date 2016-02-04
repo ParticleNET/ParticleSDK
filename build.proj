@@ -7,7 +7,6 @@
 		<OutputDir>Build</OutputDir>
 		<TmpDir>Temp</TmpDir>
 		<BuildVersion>$(APPVEYOR_BUILD_VERSION)</BuildVersion>
-		<BuildVersion Condition="'$(APPVEYOR_REPO_BRANCH)' == 'develop'">$(APPVEYOR_BUILD_VERSION)-beta</BuildVersion>
 	</PropertyGroup>
 
 	<Target Name="Build">
