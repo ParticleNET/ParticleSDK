@@ -78,6 +78,11 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// When turned on will fire when an account event comes in from the Particle Event Api
+		/// </summary>
+		public event EventHandler<WebEventArgs> AccountEvents;
+
+		/// <summary>
 		/// Makes the get request asynchronous to the cloud api
 		/// </summary>
 		/// <param name="method">The method to call i.e. devices</param>

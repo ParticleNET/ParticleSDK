@@ -48,6 +48,7 @@
     <Compile Include="ParticleCloudTests.cs" />
     <Compile Include="ParticleDeviceMock.cs" />
     <Compile Include="ParticleDeviceTests.cs" />
+    <Compile Include="ParticleEventManagerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
