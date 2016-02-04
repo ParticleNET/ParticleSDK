@@ -1,0 +1,36 @@
+0.8.4-beta
+-Updated Login and Logout to fire a change notification to IsAuthenticated
+
+0.8.3-beta
+Bug Fixes
+-Fixed Bug with Registration that required user to be logged in first.
+
+0.8.0
+Added XML Comments
+ParticleCloud
+- Implemented SignupWithUserAsynd
+- Implemented password reset
+- Implemented ClaimDevice
+- Implemented Devices property and RefreshDevicesAsync method
+- Added IsRefreshing
+ParticleDevice
+- Implemented UnclaimDevice
+- Implemented FlashKnownAppAsync
+- Change LastHeard to be LocalTime instead of Universal Time
+
+Added Exception Handling for HttpRequestException. All results will now return Success of false and Exception being filled out with that exception
+Added Electron Device id to Device Types
+Added XML Comments
+ParticleCloud
+- Implemented SignupWithUserAsynd
+- Implemented password reset
+- Implemented ClaimDevice
+- Implemented Devices property and RefreshDevicesAsync method
+- Added IsRefreshing
+ParticleDevice
+- Implemented UnclaimDevice
+- Implemented FlashKnownAppAsync
+- Change LastHeard to be LocalTime instead of Universal Time
+
+Added Exception Handling for HttpRequestException. All results will now return Success of false and Exception being filled out with that exception
+Added Electron Device id to Device Types

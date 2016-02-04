@@ -1,6 +1,12 @@
+# Build
 | master | develop |
 |--------|---------|
 |[![Build status](https://ci.appveyor.com/api/projects/status/8kcdeffb0s415rmh?svg=true)](https://ci.appveyor.com/project/holtsoftware/particlesdk)|[![Build status](https://ci.appveyor.com/api/projects/status/3oa42ovdknh4i627?svg=true)](https://ci.appveyor.com/project/holtsoftware/particlesdk-qe393)|
+
+# Nuget
+| Release | Beta |
+|---------|------|
+|[![NuGet](https://img.shields.io/nuget/v/ParticleNET.ParticleSDK.svg)](https://www.nuget.org/packages/ParticleNET.ParticleSDK)|[![NuGet](https://img.shields.io/nuget/vpre/ParticleNET.ParticleSDK.svg)](https://www.nuget.org/packages/ParticleNET.ParticleSDK)|
 
 # ParticleSDK
 .NET SDK for Particle.io (formally spark.io)
