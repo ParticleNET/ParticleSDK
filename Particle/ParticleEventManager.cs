@@ -16,6 +16,7 @@ limitations under the License.
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -32,10 +33,46 @@ namespace Particle
 		private bool stop = false;
 		private StreamReader reader;
 		private Uri streamUri;
+		private String accessToken;
 		/// <summary>
 		/// Occurs when an event is encountered from the particle cloud api
 		/// </summary>
 		public event EventHandler<WebEventArgs> Events;
+
+		/// <summary>
+		/// Occurs when there has been an error from the connection
+		/// </summary>
+		public event Action<Exception> Error;
+
+		/// <summary>
+		/// Occurs when we are going to try and reconnect to the client
+		/// </summary>
+		public event Action Reconnecting;
+
+		/// <summary>
+		/// Occurs when we have reconnected to the client
+		/// </summary>
+		public event Action Reconnected;
+
+		/// <summary>
+		/// Occurs when we have connected for the first time.
+		/// </summary>
+		public event Action Connected;
+
+		/// <summary>
+		/// Occurs when we stop listening to events
+		/// </summary>
+		public event Action Closed;
+		/// <summary>
+		/// How long in Milliseconds to wait before a read timeout occurs
+		/// Default: 30000
+		/// </summary>
+		public int ReadTimeout { get; set; } = 30000;
+		/// <summary>
+		/// How long to delay before reconnecting after being disconnected in Milliseconds
+		/// Default: 1000
+		/// </summary>
+		public int ReconnectDelay { get; set; } = 1000;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleEventManager"/> class. Without requiring the HttpClient, Access Token, or Uri mostly used for unit tests
@@ -48,12 +85,12 @@ namespace Particle
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleEventManager"/> class.
 		/// </summary>
-		/// <param name="client">The HTTP client used to listen for events.</param>
 		/// <param name="streamUri">The stream URI. i.e. https://api.particle.io/v1/devices/events </param>
 		/// <param name="accessToken">The access token for authentication.</param>
-		public ParticleEventManager(HttpClient client, Uri streamUri, String accessToken)
+		public ParticleEventManager(Uri streamUri, String accessToken)
 		{
 			this.streamUri = streamUri;
+			this.accessToken = accessToken;
 		}
 
 		/// <summary>
@@ -63,11 +100,15 @@ namespace Particle
 		/// <param name="data">The data.</param>
 		protected async void fireEvent(String eventName, ParticleEventData[] data)
 		{
-			Events?.Invoke(this, new WebEventArgs
+			await Task.Run(() =>
 			{
-				Event = eventName,
-				Data = data
+				Events?.Invoke(this, new WebEventArgs
+				{
+					Event = eventName,
+					Data = data
+				});
 			});
+			
 		}
 
 		/// <summary>
@@ -75,7 +116,34 @@ namespace Particle
 		/// </summary>
 		public async void Start()
 		{
+			while (!stop) // If we have not been told to stop reconnect to the stream if an exception has occurred
+			{
+				try
+				{
+					await ConnectToClient();
+				}
+				catch(Exception ex)
+				{
+					await Task.Delay(1000); // try to delay restart so we dont overwhelm anything
+				}
+			}
+		}
 
+		/// <summary>
+		/// Connects to client.
+		/// </summary>
+		/// <returns>A Task that can be awaited</returns>
+		protected virtual async Task ConnectToClient()
+		{
+			using (HttpClient client = new HttpClient())
+			{
+				client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+				using (var stream = await client.GetStreamAsync(streamUri))
+				{
+					stream.ReadTimeout = 30000;
+					await ListensToStreamAsync(stream).ConfigureAwait(true);
+				}
+			}
 		}
 
 		/// <summary>
@@ -89,7 +157,7 @@ namespace Particle
 			String eventName = null;
 			String line;
 			List<ParticleEventData> items = new List<ParticleEventData>();
-			while (!stop)
+			while (!stop && !reader.EndOfStream)
 			{
 				line = await reader.ReadLineAsync();
 				if (line?.StartsWith("event:") == true)

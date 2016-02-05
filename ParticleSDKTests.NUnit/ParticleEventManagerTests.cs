@@ -75,5 +75,26 @@ namespace ParticleSDKTests.NUnit
 				
 			}
 		}
+
+		[Test]
+		public async Task ListenForPublicEventsTest()
+		{
+			var eventManager = new ParticleEventManager(new Uri("https://api.particle.io/v1/events"), System.Environment.GetEnvironmentVariable("ParticleAccessToken"));
+			long eventCount = 0;
+			eventManager.Events += (s, e) =>
+			{
+				eventCount++;
+				Assert.IsFalse(String.IsNullOrWhiteSpace(e.Event));
+				Assert.IsNotNull(e.Data);
+				Assert.IsNotNull(e.Data.Length > 0);
+			};
+
+			eventManager.Start();
+			await Task.Delay(5000);
+			eventManager.Stop();
+
+			Assert.IsTrue(eventCount > 0); // Its possible for this to be 0 but not very likely
+
+		}
 	}
 }
