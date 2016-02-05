@@ -32,7 +32,7 @@ Task("CleanUp")
 Task("UpdateAssemblyVersion")
 	.Does(() =>
 {
-	var fixedVersionString = buildVersion.Replace("-beta-", ".");
+	var fixedVersionString = buildVersion.Replace("-beta-", ".").Replace("-alpha-",".");
 	
 	if(fixedVersionString.Split('.').Length == 3){
 		fixedVersionString += ".0";
