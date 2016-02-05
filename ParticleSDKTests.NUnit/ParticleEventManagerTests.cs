@@ -48,5 +48,32 @@ namespace ParticleSDKTests.NUnit
 				Assert.AreEqual("0123456789abcdef01234567", data.CoreId);
 			}
 		}
+
+		[Test]
+		public void ListensToStreamAsyncExceptionTest()
+		{
+			ParticleEventManagerMock eventManager = new ParticleEventManagerMock();
+			WebEventArgs lastEvent = null;
+			int count = 0;
+			
+
+			using (Stream s = new MemoryStream())
+			{
+
+				eventManager.Events += (se, e) =>
+				{
+					s.Close(); // cause the exception to be throw from the Listen method.
+					lastEvent = e;
+					count++;
+				};
+
+				StreamWriter w = new StreamWriter(s, Encoding.UTF8);
+				w.Write(":ok\n\nevent: test\ndata: {\"data\":\"25.34\",\"ttl\":\"60\",\"published_at\":\"2015-07-18T00:12:18.174Z\",\"coreid\":\"0123456789abcdef01234567\"}\n\nevent: test\ndata: {\"data\":\"25.34\",\"ttl\":\"60\",\"published_at\":\"2015-07-18T00:12:18.174Z\",\"coreid\":\"0123456789abcdef01234567\"}\n\n");
+				w.Flush();
+				s.Position = 0; // go back to the beginning of the stream
+				Assert.Throws<ObjectDisposedException>(async () => await eventManager.ListensToStreamAsyncMock(s));
+				
+			}
+		}
 	}
 }
