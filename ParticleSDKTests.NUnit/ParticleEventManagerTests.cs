@@ -35,6 +35,7 @@ namespace ParticleSDKTests.NUnit
 				w.Flush();
 				s.Position = 0; // go back to the beginning of the stream
 				await eventManager.ListensToStreamAsyncMock(s);
+				await Task.Delay(500); // Delay a little bit so we make sure the other threads has time to execute.
 
 
 				Assert.IsNotNull(lastEvent);
