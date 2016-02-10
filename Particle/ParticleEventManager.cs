@@ -31,6 +31,7 @@ namespace Particle
 	public class ParticleEventManager
 	{
 		private bool stop = false;
+		private bool hasConnected = false;
 		private StreamReader reader;
 		private Uri streamUri;
 		private String accessToken;
@@ -75,7 +76,7 @@ namespace Particle
 		public int ReconnectDelay { get; set; } = 1000;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ParticleEventManager"/> class. Without requiring the HttpClient, Access Token, or Uri mostly used for unit tests
+		/// Initializes a new instance of the <see cref="ParticleEventManager"/> class. Without requiring the Access Token, or Uri mostly used for unit tests
 		/// </summary>
 		protected ParticleEventManager()
 		{
@@ -124,9 +125,12 @@ namespace Particle
 				}
 				catch(Exception ex)
 				{
-					await Task.Delay(1000); // try to delay restart so we dont overwhelm anything
+					Error?.Invoke(ex);
+					await Task.Delay(ReconnectDelay); // try to delay restart so we dont overwhelm anything
 				}
 			}
+
+			Closed?.Invoke();
 		}
 
 		/// <summary>
@@ -137,10 +141,23 @@ namespace Particle
 		{
 			using (HttpClient client = new HttpClient())
 			{
+				if(hasConnected)
+				{
+					Reconnecting?.Invoke();
+				}
 				client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 				using (var stream = await client.GetStreamAsync(streamUri))
 				{
 					stream.ReadTimeout = 30000;
+					if (!hasConnected)
+					{
+						Connected?.Invoke();
+						hasConnected = true;
+					}
+					else
+					{
+						Reconnected?.Invoke();
+					}
 					await ListensToStreamAsync(stream).ConfigureAwait(true);
 				}
 			}
@@ -202,6 +219,7 @@ namespace Particle
 		public void Stop()
 		{
 			stop = true;
+			hasConnected = false;
 		}
 	}
 }
