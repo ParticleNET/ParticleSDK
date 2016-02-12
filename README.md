@@ -31,3 +31,6 @@ Install-Package ParticleNET.ParticleSDK
 * Getting a stream of your events
 * Getting a stream of events from a device
 * Publishing an event
+
+## Tests
+In order for all tests to pass you will need to set the Environmental variable ParticleAccessToken to a valid Access Token.
