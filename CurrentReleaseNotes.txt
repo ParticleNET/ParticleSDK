@@ -1,1 +1,3 @@
+-Added a class for Listening for events from the particle cloud.
+-Added the ability to get access to the access token in the ParticleCloud
 -Updated Build to CakeBuild
