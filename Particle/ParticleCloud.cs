@@ -58,6 +58,32 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Gets the users Access token or returns null if the user not authenticated.
+		/// </summary>
+		public String AccessToken
+		{
+			get
+			{
+				return authResults?.AccessToken;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets the uri to the users Events. Usally https://api.particle.io/v1/devices/events
+		/// </summary>
+		/// <value>
+		/// The Your event Uri.
+		/// </value>
+		public Uri YourEventUri
+		{
+			get
+			{
+				return new Uri(baseUri, "devices/events");
+			}
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
 		/// </summary>
 		public ParticleCloud()
@@ -76,11 +102,6 @@ namespace Particle
 			client = new HttpClient();
 			client.BaseAddress = baseUri;
 		}
-
-		/// <summary>
-		/// When turned on will fire when an account event comes in from the Particle Event Api
-		/// </summary>
-		public event EventHandler<WebEventArgs> AccountEvents;
 
 		/// <summary>
 		/// Makes the get request asynchronous to the cloud api

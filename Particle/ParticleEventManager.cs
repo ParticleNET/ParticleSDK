@@ -30,7 +30,13 @@ namespace Particle
 	/// </summary>
 	public class ParticleEventManager
 	{
-		private bool stop = false;
+		/// <summary>
+		/// Used to determen if we should keep running.
+		/// 
+		/// If this is false we keep restarting and connecting to the event service
+		/// If this is true stop listening to the event service
+		/// </summary>
+		protected bool _stop = true;
 		private bool hasConnected = false;
 		private StreamReader reader;
 		private Uri streamUri;
@@ -76,6 +82,20 @@ namespace Particle
 		public int ReconnectDelay { get; set; } = 1000;
 
 		/// <summary>
+		/// Gets a value indicating whether this instance is running.
+		/// </summary>
+		/// <value>
+		/// <c>true</c> if this instance is running; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsRunning
+		{
+			get
+			{
+				return !_stop;
+			}
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleEventManager"/> class. Without requiring the Access Token, or Uri mostly used for unit tests
 		/// </summary>
 		protected ParticleEventManager()
@@ -117,7 +137,8 @@ namespace Particle
 		/// </summary>
 		public async void Start()
 		{
-			while (!stop) // If we have not been told to stop reconnect to the stream if an exception has occurred
+			_stop = false;
+			while (!_stop) // If we have not been told to stop reconnect to the stream if an exception has occurred
 			{
 				try
 				{
@@ -174,7 +195,7 @@ namespace Particle
 			String eventName = null;
 			String line;
 			List<ParticleEventData> items = new List<ParticleEventData>();
-			while (!stop && !reader.EndOfStream)
+			while (!_stop && !reader.EndOfStream)
 			{
 				line = await reader.ReadLineAsync();
 				if (line?.StartsWith("event:") == true)
@@ -218,7 +239,7 @@ namespace Particle
 		/// </summary>
 		public void Stop()
 		{
-			stop = true;
+			_stop = true;
 			hasConnected = false;
 		}
 	}

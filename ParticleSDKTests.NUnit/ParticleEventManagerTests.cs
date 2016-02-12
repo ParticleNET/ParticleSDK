@@ -65,6 +65,8 @@ namespace ParticleSDKTests.NUnit
 			}
 		}
 
+		/* This test does not always execute correctly because the Task To fire the event may not execute until after the Task for ListenToStreamAsync finishes executing
+
 		[Test]
 		public async Task ListensToStreamAsyncExceptionTest()
 		{
@@ -75,7 +77,6 @@ namespace ParticleSDKTests.NUnit
 
 			using (Stream s = new MemoryStream())
 			{
-
 				eventManager.Events += (se, e) =>
 				{
 					s.Close(); // cause the exception to be throw from the Listen method.
@@ -100,7 +101,7 @@ namespace ParticleSDKTests.NUnit
 				Assert.IsTrue(exceptionThrown);
 				
 			}
-		}
+		}*/
 
 		[Test]
 		public async Task ListenForPublicEventsTest()
@@ -116,11 +117,15 @@ namespace ParticleSDKTests.NUnit
 			};
 
 			eventManager.Start();
+			Assert.IsTrue(eventManager.IsRunning);
 			await Task.Delay(5000);
 			eventManager.Stop();
+			Assert.IsFalse(eventManager.IsRunning);
 
 			Assert.IsTrue(eventCount > 0); // Its possible for this to be 0 but not very likely
 
 		}
+
+		/* It would be nice to have a test for all the events the Event Manager has but not sure how to simulate the network disconnecting and reconnecting that would be required */
 	}
 }

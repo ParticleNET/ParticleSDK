@@ -31,6 +31,7 @@ namespace ParticleSDKTests.NUnit
 
 		public Task ListensToStreamAsyncMock(Stream s)
 		{
+			_stop = false;
 			return ListensToStreamAsync(s);
 		}
 
