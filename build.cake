@@ -100,14 +100,26 @@ Task("NuGetPack")
 	.IsDependentOn("AppVeyorUpdate")
 	.Does(() =>
 {
+	var local = buildVersion;
+	var index = 0;
+	if((index = local.IndexOf("-beta-")) > -1)
+	{
+		var version = long.Parse(local.Substring(index + 6));
+		local = String.Format("{0}{1:0000}", local.Substring(0, index+6), version);
+	}
+	if((index = local.IndexOf("-alpha-")) > -1)
+	{
+		var version = long.Parse(local.Substring(index + 7));
+		local = String.Format("{0}{1:0000}", local.Substring(0, index+7), version);
+	}
 	StringBuilder releaseNotes = new StringBuilder();
-	releaseNotes.AppendLine(buildVersion);
+	releaseNotes.AppendLine(local);
 	releaseNotes.AppendLine(System.IO.File.ReadAllText("CurrentReleaseNotes.txt"));
 	releaseNotes.AppendLine();
 	releaseNotes.AppendLine(System.IO.File.ReadAllText("PreviousReleaseNotes.txt"));
 	NuGetPack("nuspec\\ParticleNET.ParticleSDK.nuspec", new NuGetPackSettings()
 	{
-		Version = buildVersion,
+		Version = local,
 		OutputDirectory = outputDirectory,
 		ReleaseNotes = new []{releaseNotes.ToString()}
 	});
