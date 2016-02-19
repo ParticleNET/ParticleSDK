@@ -46,6 +46,8 @@ namespace ParticleSDKTests
 	'last_heard': '2015-05-25T01:15:36.034Z',
 	'product_id': 0,
 	'connected': true,
+	'cellular': false,
+	'status': 'normal',
 	'variables':{
 		temp: 'double',
 		temp2: 'int',
@@ -63,6 +65,78 @@ namespace ParticleSDKTests
 			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>().ToLocalTime(), p.LastHeard);
 			Assert.AreEqual(ParticleDeviceType.Core, p.DeviceType);
 			Assert.IsTrue(p.Connected);
+			Assert.IsNull(p.PlatformId);
+			Assert.IsFalse(p.Cellular);
+			Assert.AreEqual("normal", p.Status);
+			Assert.IsNull(p.LastICCID);
+			Assert.IsNull(p.IMEI);
+			Assert.IsNull(p.CurrentBuildTarget);
+
+			Assert.AreEqual(3, p.Variables.Count);
+			var variable = p.Variables[0];
+			Assert.AreEqual("temp", variable.Name);
+			Assert.AreEqual(VariableType.Double, variable.Type);
+			variable = p.Variables[1];
+			Assert.AreEqual("temp2", variable.Name);
+			Assert.AreEqual(VariableType.Int, variable.Type);
+			variable = p.Variables[2];
+			Assert.AreEqual("temp3", variable.Name);
+			Assert.AreEqual(VariableType.String, variable.Type);
+
+			var functions = p.Functions;
+			Assert.AreEqual(2, functions.Count);
+			Assert.AreEqual("led", functions[0]);
+			Assert.AreEqual("led2", functions[1]);
+		}
+
+		[Test]
+		public void ParseElectronTest()
+		{
+			var p = new ParticleDeviceMock(new JObject());
+			var message = Assert.Throws<ArgumentNullException>(() => { p.ParseObjectMock(null); });
+			Assert.AreEqual("obj", message.ParamName);
+
+			var obj = JObject.Parse(@"{'id':'3a', 'name':null}");
+			p.ParseObjectMock(obj);
+			Assert.AreEqual("3a", p.Id);
+			Assert.AreEqual(null, p.Name);
+
+			obj = JObject.Parse(@"{'id': '356a6',
+	'name': 'CobbleFriend',
+	'last_app': 'cheese',
+	'last_ip_address': '161.20.133.22:45478',
+	'last_heard': '2015-05-25T01:15:36.034Z',
+	'product_id': 10,
+	'connected': true,
+	'platform_id': 10,
+	'cellular': true,
+	'status': 'normal',
+	'last_iccid': '1000023400005678900',
+	'imei': '312345678933111',
+	'current_build_target': '0.4.8',
+	'variables':{
+		temp: 'double',
+		temp2: 'int',
+		temp3: 'string'
+	},
+	'functions':[
+		'led',
+		'led2'
+	]}");
+			p.ParseObjectMock(obj);
+			Assert.AreEqual("356a6", p.Id);
+			Assert.AreEqual("CobbleFriend", p.Name);
+			Assert.AreEqual("cheese", p.LastApp);
+			Assert.AreEqual("161.20.133.22:45478", p.LastIPAddress);
+			Assert.AreEqual(JToken.Parse("'2015-05-25T01:15:36.034Z'").Value<DateTime>().ToLocalTime(), p.LastHeard);
+			Assert.AreEqual(ParticleDeviceType.Electron, p.DeviceType);
+			Assert.AreEqual(10, p.PlatformId);
+			Assert.IsTrue(p.Connected);
+			Assert.IsTrue(p.Cellular);
+			Assert.AreEqual("normal", p.Status);
+			Assert.AreEqual("1000023400005678900", p.LastICCID);
+			Assert.AreEqual("312345678933111", p.IMEI);
+			Assert.AreEqual("0.4.8", p.CurrentBuildTarget);
 
 			Assert.AreEqual(3, p.Variables.Count);
 			var variable = p.Variables[0];

@@ -1,3 +1,8 @@
+0.8.4-beta-8 
+-Added a class for Listening for events from the particle cloud. 
+-Added the ability to get access to the access token in the ParticleCloud 
+-Updated Build to CakeBuild 
+
 0.8.4-beta
 -Updated Login and Logout to fire a change notification to IsAuthenticated
 
