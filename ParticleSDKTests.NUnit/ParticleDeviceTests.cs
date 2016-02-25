@@ -578,6 +578,67 @@ id: '1234'
 		}
 
 		[Test]
+		public async Task FlashExampleAppAsyncTest()
+		{
+			using (ParticleCloudMock cloud = new ParticleCloudMock())
+			{
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					Assert.AreEqual("PUT", a);
+					Assert.AreEqual("devices/3", b);
+					Assert.AreEqual(1, c.Length);
+					var p1 = c[0];
+					Assert.AreEqual("app_example_id", p1.Key);
+					Assert.AreEqual("56214d636666d9ece3000001", p1.Value);
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.OK,
+						Response = JToken.Parse(@"{
+			  'ok': false,
+			  'code': 500,
+			  'errors': [
+				'Can\'t flash unknown app newTest'
+			  ]
+					}")
+					};
+				};
+
+				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
+
+				var exc = Assert.Throws<ArgumentNullException>(() => { p.FlashExampleAppAsync(null).GetAwaiter().GetResult(); });
+				Assert.AreEqual("exampleId", exc.ParamName);
+
+				var result = await p.FlashExampleAppAsync("56214d636666d9ece3000001");
+				Assert.IsNotNull(result);
+				Assert.IsFalse(result.Success);
+				Assert.AreEqual("Can't flash unknown app newTest", result.Error);
+
+				cloud.RequestCallBack = (a, b, c) =>
+				{
+					Assert.AreEqual("PUT", a);
+					Assert.AreEqual("devices/3", b);
+					Assert.AreEqual(1, c.Length);
+					var p1 = c[0];
+					Assert.AreEqual("app_example_id", p1.Key);
+					Assert.AreEqual("56214d636666d9ece3000006", p1.Value);
+					return new RequestResponse
+					{
+						StatusCode = System.Net.HttpStatusCode.OK,
+						Response = JToken.Parse(@"{
+  'id': '3',
+  'status': 'Update started'
+}")
+					};
+				};
+
+				result = await p.FlashExampleAppAsync("56214d636666d9ece3000006");
+				Assert.IsNotNull(result);
+				Assert.IsTrue(result.Success);
+				Assert.AreEqual("Update started", result.Message);
+			}
+		}
+
+		[Test]
 		public async Task FlashKnownAppAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())

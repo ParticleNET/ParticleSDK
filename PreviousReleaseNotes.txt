@@ -1,3 +1,7 @@
+0.8.5-beta-0013 
+-Updated ParticleDevice to support Electron elements. 
+-Added test for Electron Elements 
+
 0.8.4-beta-8 
 -Added a class for Listening for events from the particle cloud. 
 -Added the ability to get access to the access token in the ParticleCloud 

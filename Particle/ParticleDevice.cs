@@ -819,6 +819,47 @@ namespace Particle
 			}
 		}
 
+		/// <summary>
+		/// Flashes the example application asynchronous.
+		/// </summary>
+		/// <param name="exampleId">The example identifier. This can be found at build.particle.io</param>
+		/// <returns></returns>
+		/// <exception cref="System.ArgumentNullException">a null example id is passed</exception>
+		public async Task<Result> FlashExampleAppAsync(String exampleId)
+		{
+			if (String.IsNullOrWhiteSpace(exampleId))
+			{
+				throw new ArgumentNullException(nameof(exampleId));
+			}
+
+			try
+			{
+				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app_example_id", exampleId));
+				if (result.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					var r = result.AsResult();
+					if (String.IsNullOrWhiteSpace(r.Error))
+					{
+						r.Success = true;
+					}
+					return r;
+				}
+				else
+				{
+					return result.AsResult();
+				}
+			}
+			catch (HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
+		}
+
 		// this method signature should probably change
 		/*public async Task<Result> FlashFilesAsync(IDictionary<String, byte[]> files)
 		{

@@ -45,5 +45,16 @@ namespace Particle
 		/// </value>
 		[JsonProperty("coreid")]
 		public String CoreId { get; set; }
+
+		/// <summary>
+		/// Returns a <see cref="System.String" /> that represents this instance as Json data
+		/// </summary>
+		/// <returns>
+		/// A <see cref="System.String" /> that represents this instance.
+		/// </returns>
+		public override string ToString()
+		{
+			return JsonConvert.SerializeObject(this);
+		}
 	}
 }
