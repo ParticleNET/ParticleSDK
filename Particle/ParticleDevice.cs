@@ -135,6 +135,66 @@ namespace Particle
 			internal set { SetProperty(ref connected, value); }
 		}
 
+		private int? platformId;
+		/// <summary>
+		/// The PlatformId for the ParticleDevice
+		/// </summary>
+		public int? PlatformId
+		{
+			get { return platformId; }
+			internal set { SetProperty(ref platformId, value); }
+		}
+
+		private bool cellular = false;
+		/// <summary>
+		/// Does this device have a cellular connection.
+		/// </summary>
+		public bool Cellular
+		{
+			get { return cellular; }
+			internal set { SetProperty(ref cellular, value); }
+		}
+
+		private String status;
+		/// <summary>
+		/// The Status of the device
+		/// </summary>
+		public String Status
+		{
+			get { return status; }
+			internal set { SetProperty(ref status, value); }
+		}
+
+		private String lastICCID;
+		/// <summary>
+		/// Last SIM card ID used if an Electron
+		/// </summary>
+		public String LastICCID
+		{
+			get { return lastICCID; }
+			internal set { SetProperty(ref lastICCID, value); }
+		}
+
+		private String imei;
+		/// <summary>
+		/// IMEI number if Electron
+		/// </summary>
+		public String IMEI
+		{
+			get { return imei; }
+			internal set { SetProperty(ref imei, value); }
+		}
+
+		private String currentBuildTarget;
+		/// <summary>
+		/// The Current Build Target
+		/// </summary>
+		public String CurrentBuildTarget
+		{
+			get { return currentBuildTarget; }
+			internal set { SetProperty(ref currentBuildTarget, value); }
+		}
+
 		private ObservableCollection<Variable> variables = new ObservableCollection<Variable>();
 		/// <summary>
 		/// Gets the variables defined for this device. Be sure to call <see cref="RefreshAsync"/> to refresh this list.
@@ -194,6 +254,16 @@ namespace Particle
 			}
 
 			return 0;
+		}
+
+		private int? parseNullableIntValue(JToken token)
+		{
+			if(token?.Type == JTokenType.Integer)
+			{
+				return (int)token.Value<long>();
+			}
+
+			return null;
 		}
 
 		private bool parseBooleanValue(JToken token)
@@ -340,9 +410,10 @@ namespace Particle
 						});
 						break;
 					case "product_id":
+						var prid = parseIntValue(prop.Value);
 						ParticleCloud.SyncContext.InvokeIfRequired(() =>
 						{
-							switch (parseIntValue(prop.Value))
+							switch (prid)
 							{
 								case 0:
 									DeviceType = ParticleDeviceType.Core;
@@ -360,10 +431,59 @@ namespace Particle
 							}
 						});
 						break;
-					case "connected":
+					case "platform_id":
+						var pid = parseNullableIntValue(prop.Value);
 						ParticleCloud.SyncContext.InvokeIfRequired(() =>
 						{
-							Connected = parseBooleanValue(prop.Value);
+							PlatformId = pid;
+						});
+						break;
+
+					case "cellular":
+						bool cell = parseBooleanValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Cellular = cell;
+						});
+						break;
+
+					case "status":
+						var stat = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Status = stat;
+						});
+						break;
+
+					case "last_iccid":
+						var iccid = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							LastICCID = iccid;
+						});
+						break;
+
+					case "imei":
+						var _imei = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							IMEI = _imei;
+						});
+						break;
+
+					case "current_build_target":
+						var cbt = parseStringValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							CurrentBuildTarget = cbt;
+						});
+						break;
+
+					case "connected":
+						var conn = parseBooleanValue(prop.Value);
+						ParticleCloud.SyncContext.InvokeIfRequired(() =>
+						{
+							Connected = conn;
 						});
 						break;
 					case "variables":
@@ -689,6 +809,47 @@ namespace Particle
 				}
 			}
 			catch(HttpRequestException re)
+			{
+				return new Result
+				{
+					Success = false,
+					Error = re.Message,
+					Exception = re
+				};
+			}
+		}
+
+		/// <summary>
+		/// Flashes the example application asynchronous.
+		/// </summary>
+		/// <param name="exampleId">The example identifier. This can be found at build.particle.io</param>
+		/// <returns></returns>
+		/// <exception cref="System.ArgumentNullException">a null example id is passed</exception>
+		public async Task<Result> FlashExampleAppAsync(String exampleId)
+		{
+			if (String.IsNullOrWhiteSpace(exampleId))
+			{
+				throw new ArgumentNullException(nameof(exampleId));
+			}
+
+			try
+			{
+				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app_example_id", exampleId));
+				if (result.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					var r = result.AsResult();
+					if (String.IsNullOrWhiteSpace(r.Error))
+					{
+						r.Success = true;
+					}
+					return r;
+				}
+				else
+				{
+					return result.AsResult();
+				}
+			}
+			catch (HttpRequestException re)
 			{
 				return new Result
 				{

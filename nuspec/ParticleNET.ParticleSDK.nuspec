@@ -11,22 +11,6 @@
 		<iconUrl>https://raw.githubusercontent.com/ParticleNET/ParticleSDK/master/nuspec/icon.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>A wrapper around the Particle.io (formally spark.io) cloud api. Supporting .net 4.5, Windows Runtime 8, and Windows Phone 8.</description>
-		<releaseNotes>
-Added XML Comments
-ParticleCloud
-- Implemented SignupWithUserAsynd
-- Implemented password reset
-- Implemented ClaimDevice
-- Implemented Devices property and RefreshDevicesAsync method
-- Added IsRefreshing
-ParticleDevice
-- Implemented UnclaimDevice
-- Implemented FlashKnownAppAsync
-- Change LastHeard to be LocalTime instead of Universal Time
-
-Added Exception Handling for HttpRequestException. All results will now return Success of false and Exception being filled out with that exception
-Added Electron Device id to Device Types
-		</releaseNotes>
 		<tags>Spark, Spark.io, Particle, Particle.io, ParticleNET</tags>
 		<dependencies>
 			<dependency id="Newtonsoft.Json" version="7.0.1" />

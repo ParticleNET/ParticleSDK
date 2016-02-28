@@ -58,6 +58,32 @@ namespace Particle
 		}
 
 		/// <summary>
+		/// Gets the users Access token or returns null if the user not authenticated.
+		/// </summary>
+		public String AccessToken
+		{
+			get
+			{
+				return authResults?.AccessToken;
+			}
+		}
+
+
+		/// <summary>
+		/// Gets the uri to the users Events. Usally https://api.particle.io/v1/devices/events
+		/// </summary>
+		/// <value>
+		/// The Your event Uri.
+		/// </value>
+		public Uri YourEventUri
+		{
+			get
+			{
+				return new Uri(baseUri, "devices/events");
+			}
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="ParticleCloud" /> class using the default url https://api.particle.io/v1/
 		/// </summary>
 		public ParticleCloud()
@@ -121,6 +147,38 @@ namespace Particle
 			}
 
 			return result;
+		}
+
+		/// <summary>
+		/// Makes the post request without authentication asynchronous to the particle cloud.
+		/// </summary>
+		/// <param name="method">The method.</param>
+		/// <param name="arguments">The arguments.</param>
+		/// <returns>The Results of the request</returns>
+		public virtual async Task<RequestResponse> MakePostRequestWithoutAuthAsync(String method, params KeyValuePair<String, String>[] arguments)
+		{
+			if (String.IsNullOrWhiteSpace(method))
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			client.DefaultRequestHeaders.Clear();
+
+			HttpResponseMessage response;
+			if (arguments != null)
+			{
+				response = await client.PostAsync(method, new FormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PostAsync(method, null);
+			}
+			var str = await response.Content.ReadAsStringAsync();
+			RequestResponse rr = new RequestResponse();
+			rr.StatusCode = response.StatusCode;
+			rr.Response = await Task.Run(() => JToken.Parse(str));
+
+			return rr;
 		}
 
 		/// <summary>
@@ -380,6 +438,7 @@ namespace Particle
 							authResults = ret;
 							authResults.Username = username;
 							authResults.Password = password;
+							FirePropertyChanged(nameof(IsAuthenticated));
 							return new Result
 							{
 								Success = true
@@ -434,7 +493,7 @@ namespace Particle
 
 			try
 			{
-				var result = await MakePostRequestAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
+				var result = await MakePostRequestWithoutAuthAsync("users", new KeyValuePair<string, string>("username", username), new KeyValuePair<string, string>("password", password));
 
 				return result.AsResult();
 			}
@@ -484,6 +543,7 @@ namespace Particle
 		public void Logout()
 		{
 			authResults = null;
+			FirePropertyChanged(nameof(IsAuthenticated));
 		}
 
 		/// <summary>

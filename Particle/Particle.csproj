@@ -40,6 +40,8 @@
     <DocumentationFile>bin\Release\Particle.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ParticleEventData.cs" />
+    <Compile Include="ParticleEventManager.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Messages.Designer.cs">
@@ -59,6 +61,7 @@
     <Compile Include="Results\AuthenticationResults.cs" />
     <Compile Include="Variable.cs" />
     <Compile Include="VariableType.cs" />
+    <Compile Include="WebEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
