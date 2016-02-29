@@ -44,11 +44,6 @@
     <Compile Include="ParticleEventManager.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Messages.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Messages.resx</DependentUpon>
-    </Compile>
     <Compile Include="ParticleBase.cs" />
     <Compile Include="ParticleAuthenticationExeption.cs" />
     <Compile Include="ParticleCloud.cs" />
@@ -59,6 +54,7 @@
     <Compile Include="RequestResponse.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="Results\AuthenticationResults.cs" />
+    <Compile Include="RH.cs" />
     <Compile Include="Variable.cs" />
     <Compile Include="VariableType.cs" />
     <Compile Include="WebEventArgs.cs" />
@@ -86,8 +82,6 @@
       <Link>LICENSE</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="Messages.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />

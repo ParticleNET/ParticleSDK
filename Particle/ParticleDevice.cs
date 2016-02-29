@@ -556,7 +556,7 @@ namespace Particle
 
 			if (String.IsNullOrWhiteSpace(variable.Name))
 			{
-				throw new ArgumentException(Messages.PassedVariableMustHaveAName, nameof(variable));
+				throw new ArgumentException(RH.C.GetString("PassedVariableMustHaveAName"), nameof(variable));
 			}
 
 			var svariable = await Task.Run(() => variables.FirstOrDefault(i => i == variable));
@@ -690,7 +690,7 @@ namespace Particle
 						IsRefreshing = false;
 						return new Result()
 						{
-							Error = Messages.UnexpectedResponse,
+							Error = RH.C.GetString("UnexpectedResponse"),
 							ErrorDescription = response.Response?.ToString()
 						};
 					}
