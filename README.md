@@ -15,7 +15,11 @@ Implemented as a Portable Library targeting .NET 4.5, WP 8, Windows 8.
 
 [Automatic Documentation](http://particlenet.github.io/Docs/index.html)
 
-The example app will be an implementation of the Tinker App for WP 8.1, Windows 8.1 and Windows 10 found here https://github.com/ParticleNET/Particle-Windows-app
+# Tinker App
+The example app will be an implementation of the Tinker App for WP 8.1, Windows 8.1 and Windows 10 found [here](https://github.com/ParticleNET/Particle-Windows-app).
+
+**Download Tinker App**<br />
+[Windows Store 8.1](http://apps.microsoft.com/windows/app/f9a2a89a-1adb-49ce-abff-0da6be35aa0c)
 
 ## Adding to your project
 To install ParticleSDK, run the following command in the [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console)<br />
@@ -28,6 +32,5 @@ Install-Package ParticleNET.ParticleSDK
 * Flashing a compiled file
 * Getting a device directly by its id
 * Getting a stream of events
-* Getting a stream of your events
 * Getting a stream of events from a device
 * Publishing an event
