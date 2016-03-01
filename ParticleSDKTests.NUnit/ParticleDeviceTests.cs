@@ -20,12 +20,53 @@ using Newtonsoft.Json.Linq;
 using Particle;
 using System.Threading.Tasks;
 using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace ParticleSDKTests
 {
 	[TestFixture]
 	public class ParticleDeviceTests
 	{
+#if DEBUG
+		[Test]
+		public void ParseExceptionTest()
+		{
+			var p = new ParticleDeviceMock(new JObject());
+
+			var obj = JObject.Parse(@"{'id':'3a', 'name':null}");
+			p.ParseObjectMock(obj);
+			Assert.AreEqual("3a", p.Id);
+			Assert.AreEqual(null, p.Name);
+
+			var json = @"{'id': '356a',
+	'name': 'Work',
+	'last_app': 'cheese',
+	'last_ip_address': '192.168.0.1',
+	'last_heard': '2015-05-25T01:15:36.034Z',
+	'product_id': 0,
+	'connected': true,
+	'cellular': false,
+	'status': 'normal',
+	'variables':{
+		temp: 'double',
+		temp2: 'int',
+		temp3: 'string'
+	},
+	'NETExceptionTest': 0,
+	'functions':[
+		'led',
+		'led2'
+	]}";
+
+
+			obj = JObject.Parse(json);
+			var ex = Assert.Throws<ParticleParseException>(() => p.ParseObjectMock(obj));
+			Assert.AreEqual("Error parsing.", ex.Message);
+			Assert.IsFalse(String.IsNullOrWhiteSpace(ex.SourceJson));
+			Assert.IsNotNull(ex.InnerException);
+			Assert.IsInstanceOf<JsonException>(ex.InnerException);
+		}
+#endif
 
 		[Test]
 		public void ParseTest()

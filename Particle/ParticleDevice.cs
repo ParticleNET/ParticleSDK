@@ -500,12 +500,20 @@ namespace Particle
 								ParseFunctions((JArray)prop.Value);
 							}
 							break;
+#if DEBUG // Not sure what json is causing the error so lets write our test with a special test
+						case "NETExceptionTest":
+							throw new JsonException("Error parsing.");
+#endif
+						default:
+							break;
 					}
 				}
 			}
 			catch(Exception ex)
 			{
 				var nex = new ParticleParseException(ex.Message, ex);
+				nex.PropertyName = propName;
+				nex.SourceJson = obj.ToString();
 				throw nex;
 			}
 		}
