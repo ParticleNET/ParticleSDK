@@ -364,9 +364,11 @@ namespace Particle
 		}
 
 		/// <summary>
-		/// Parses the JSon Object representing a particle device
+		/// Parses the provided JObject into a ParticleDevice
 		/// </summary>
 		/// <param name="obj">The object.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="obj"/> is null</exception>
+		/// <exception cref="JsonException">There was an error parsing the json provided. (This should be added as an issue when it happens)</exception>
 		protected internal virtual void ParseObject(JObject obj)
 		{
 			if (obj == null)
