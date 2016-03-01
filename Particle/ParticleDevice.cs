@@ -373,133 +373,140 @@ namespace Particle
 			{
 				throw new ArgumentNullException(nameof(obj));
 			}
-
-			foreach (var prop in obj.Properties())
-			{
-				var name = prop.Name;
-				switch (name)
+			String propName = null;
+			try {
+				foreach (var prop in obj.Properties())
 				{
-					case "id":
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							Id = parseStringValue(prop.Value);
-						});
-						break;
-					case "name":
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							Name = parseStringValue(prop.Value);
-						});
-						break;
-					case "last_app":
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							LastApp = parseStringValue(prop.Value);
-						});
-						break;
-					case "last_ip_address":
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							LastIPAddress = parseStringValue(prop.Value);
-						});
-						break;
-					case "last_heard":
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							LastHeard = parseDateTimeValue(prop.Value);
-						});
-						break;
-					case "product_id":
-						var prid = parseIntValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							switch (prid)
+					propName = prop.Name;
+					switch (propName)
+					{
+						case "id":
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
 							{
-								case 0:
-									DeviceType = ParticleDeviceType.Core;
-									break;
+								Id = parseStringValue(prop.Value);
+							});
+							break;
+						case "name":
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								Name = parseStringValue(prop.Value);
+							});
+							break;
+						case "last_app":
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								LastApp = parseStringValue(prop.Value);
+							});
+							break;
+						case "last_ip_address":
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								LastIPAddress = parseStringValue(prop.Value);
+							});
+							break;
+						case "last_heard":
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								LastHeard = parseDateTimeValue(prop.Value);
+							});
+							break;
+						case "product_id":
+							var prid = parseIntValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								switch (prid)
+								{
+									case 0:
+										DeviceType = ParticleDeviceType.Core;
+										break;
 
-								case 10:
-									DeviceType = ParticleDeviceType.Electron;
-									break;
+									case 10:
+										DeviceType = ParticleDeviceType.Electron;
+										break;
 
-								case 5:
-								case 6:
-								default:
-									DeviceType = ParticleDeviceType.Photon;
-									break;
+									case 5:
+									case 6:
+									default:
+										DeviceType = ParticleDeviceType.Photon;
+										break;
+								}
+							});
+							break;
+						case "platform_id":
+							var pid = parseNullableIntValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								PlatformId = pid;
+							});
+							break;
+
+						case "cellular":
+							bool cell = parseBooleanValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								Cellular = cell;
+							});
+							break;
+
+						case "status":
+							var stat = parseStringValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								Status = stat;
+							});
+							break;
+
+						case "last_iccid":
+							var iccid = parseStringValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								LastICCID = iccid;
+							});
+							break;
+
+						case "imei":
+							var _imei = parseStringValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								IMEI = _imei;
+							});
+							break;
+
+						case "current_build_target":
+							var cbt = parseStringValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								CurrentBuildTarget = cbt;
+							});
+							break;
+
+						case "connected":
+							var conn = parseBooleanValue(prop.Value);
+							ParticleCloud.SyncContext.InvokeIfRequired(() =>
+							{
+								Connected = conn;
+							});
+							break;
+						case "variables":
+							if (prop.Value?.Type == JTokenType.Object)
+							{
+								ParseVariables((JObject)prop.Value);
+
 							}
-						});
-						break;
-					case "platform_id":
-						var pid = parseNullableIntValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							PlatformId = pid;
-						});
-						break;
-
-					case "cellular":
-						bool cell = parseBooleanValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							Cellular = cell;
-						});
-						break;
-
-					case "status":
-						var stat = parseStringValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							Status = stat;
-						});
-						break;
-
-					case "last_iccid":
-						var iccid = parseStringValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							LastICCID = iccid;
-						});
-						break;
-
-					case "imei":
-						var _imei = parseStringValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							IMEI = _imei;
-						});
-						break;
-
-					case "current_build_target":
-						var cbt = parseStringValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							CurrentBuildTarget = cbt;
-						});
-						break;
-
-					case "connected":
-						var conn = parseBooleanValue(prop.Value);
-						ParticleCloud.SyncContext.InvokeIfRequired(() =>
-						{
-							Connected = conn;
-						});
-						break;
-					case "variables":
-						if (prop.Value?.Type == JTokenType.Object)
-						{
-							ParseVariables((JObject)prop.Value);
-
-						}
-						break;
-					case "functions":
-						if (prop.Value?.Type == JTokenType.Array)
-						{
-							ParseFunctions((JArray)prop.Value);
-						}
-						break;
+							break;
+						case "functions":
+							if (prop.Value?.Type == JTokenType.Array)
+							{
+								ParseFunctions((JArray)prop.Value);
+							}
+							break;
+					}
 				}
+			}
+			catch(Exception ex)
+			{
+				var nex = new ParticleParseException(ex.Message, ex);
+				throw nex;
 			}
 		}
 

@@ -40,8 +40,10 @@
     <DocumentationFile>bin\Release\Particle.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ParticleDoc.cs" />
     <Compile Include="ParticleEventData.cs" />
     <Compile Include="ParticleEventManager.cs" />
+    <Compile Include="ParticleParseException.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="ParticleBase.cs" />

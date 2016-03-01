@@ -14,13 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
  */
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Particle
 {
@@ -30,7 +25,7 @@ namespace Particle
 	public abstract class ParticleBase : INotifyPropertyChanged
 	{
 		/// <summary>
-		/// Occurs when [property changed].
+		/// Occurs when a [property changed].
 		/// </summary>
 		public event PropertyChangedEventHandler PropertyChanged;
 
