@@ -1,9 +1,2 @@
--Added FlashExampleAppAsync
--Added meaning full ParticleEventData.ToString()
--Updated ParticleDevice to support Electron elements. 
--Added test for Electron Elements 
--Added a class for Listening for events from the particle cloud. 
--Added the ability to get access to the access token in the ParticleCloud 
--Updated Build to CakeBuild 
--Updated Login and Logout to fire a change notification to IsAuthenticated
--Fixed Bug with Registration that required user to be logged in first.
+-Added class for loading resource messages.
+-Added some exception wrapping around Parsing so developers can see the offending json
