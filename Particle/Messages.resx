@@ -138,4 +138,8 @@
   <data name="PassedVariableMustHaveAName" xml:space="preserve">
     <value>The passed variable must have a name</value>
   </data>
+  <data name="UnitTestString" xml:space="preserve">
+    <value>This string is just for unit testing the ResourceHelper</value>
+    <comment>Dont Translate this string</comment>
+  </data>
 </root>

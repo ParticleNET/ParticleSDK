@@ -117,7 +117,7 @@ namespace Particle
 
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+				throw new ParticleAuthenticationExeption(String.Format(RH.C.GetString("YouMusthAuthenticateBeforeCalling"), method));
 			}
 
 
@@ -196,7 +196,7 @@ namespace Particle
 
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+				throw new ParticleAuthenticationExeption(String.Format(RH.C.GetString("YouMusthAuthenticateBeforeCalling"), method));
 			}
 
 
@@ -253,7 +253,7 @@ namespace Particle
 
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+				throw new ParticleAuthenticationExeption(String.Format(RH.C.GetString("YouMusthAuthenticateBeforeCalling"), method));
 			}
 
 			client.DefaultRequestHeaders.Clear();
@@ -308,7 +308,7 @@ namespace Particle
 
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(String.Format(Messages.YouMusthAuthenticateBeforeCalling, method));
+				throw new ParticleAuthenticationExeption(String.Format(RH.C.GetString("YouMusthAuthenticateBeforeCalling"), method));
 			}
 
 			client.DefaultRequestHeaders.Clear();
@@ -349,7 +349,7 @@ namespace Particle
 		{
 			if (authResults == null)
 			{
-				throw new ParticleAuthenticationExeption(Messages.YouMustLoginBeforeRefreshingToken);
+				throw new ParticleAuthenticationExeption(RH.C.GetString("YouMustLoginBeforeRefreshingToken"));
 			}
 
 			return LoginWithUserAsync(authResults.Username, authResults.Password, authResults.ExpiresIn);
