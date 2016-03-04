@@ -1,2 +1,0 @@
--Added class for loading resource messages.
--Added some exception wrapping around Parsing so developers can see the offending json
