@@ -72,9 +72,10 @@ namespace Particle
 		public event Action Closed;
 		/// <summary>
 		/// How long in Milliseconds to wait before a read timeout occurs
-		/// Default: 30000
+		/// If ReadTimeout is set to 0 Timeout is not set. On Windows Phone the stream does not support this timeout on the stream.
+		/// Default: 0
 		/// </summary>
-		public int ReadTimeout { get; set; } = 30000;
+		public int ReadTimeout { get; set; } = 0;
 		/// <summary>
 		/// How long to delay before reconnecting after being disconnected in Milliseconds
 		/// Default: 1000
@@ -169,7 +170,10 @@ namespace Particle
 				client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 				using (var stream = await client.GetStreamAsync(streamUri))
 				{
-					stream.ReadTimeout = 30000;
+					if (ReadTimeout > 0)
+					{
+						stream.ReadTimeout = ReadTimeout;
+					}
 					if (!hasConnected)
 					{
 						Connected?.Invoke();
