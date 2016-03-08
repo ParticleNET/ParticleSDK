@@ -123,6 +123,10 @@ namespace Particle
 
 			client.DefaultRequestHeaders.Clear();
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+			client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue()
+			{
+				NoCache = true
+			};
 			HttpResponseMessage response = await client.GetAsync(method);
 			var str = await response.Content.ReadAsStringAsync();
 			RequestResponse rr = new RequestResponse();
