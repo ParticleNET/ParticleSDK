@@ -1,1 +1,2 @@
 -Disabled Caching in HttpClient
+-Updated Logic on ParticleEventManager so were not setting time out on windows phone
