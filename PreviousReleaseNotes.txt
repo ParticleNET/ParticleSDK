@@ -1,3 +1,7 @@
+0.8.14
+-Added class for loading resource messages.
+-Added some exception wrapping around Parsing so developers can see the offending json
+
 0.8.7
 -Added FlashExampleAppAsync
 -Added meaning full ParticleEventData.ToString()
