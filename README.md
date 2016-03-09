@@ -19,7 +19,8 @@ Implemented as a Portable Library targeting .NET 4.5, WP 8, Windows 8.
 The example app is an implementation of the Tinker App for WP 8.1, Windows 8.1 and Windows 10 found [here](https://github.com/ParticleNET/Particle-Windows-app).
 
 **Download Tinker App**<br />
-[Windows Store 8.1](http://apps.microsoft.com/windows/app/f9a2a89a-1adb-49ce-abff-0da6be35aa0c)
+[Windows Store 8.1](http://apps.microsoft.com/windows/app/f9a2a89a-1adb-49ce-abff-0da6be35aa0c)<br />
+[Windows Phone Store 8.1](http://windowsphone.com/s?appid=71eaa2c4-b093-4d1a-b5d3-046e6c2f9826)
 
 ## Adding to your project
 To install ParticleSDK, run the following command in the [Package Manager Console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console)<br />
