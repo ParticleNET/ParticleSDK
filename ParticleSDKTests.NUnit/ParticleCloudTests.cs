@@ -41,7 +41,7 @@ namespace ParticleSDKTests
 				Assert.IsFalse(results.Success, "User some how authenticated?");
 				Assert.AreEqual("User credentials are invalid", results.ErrorDescription);
 
-				results = await cloud.LoginWithUserAsync(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"]);
+				results = await cloud.LoginWithUserAsync("test", "test");
 				Assert.IsTrue(results.Success, "User did not authenticate");
 			}
 		}
@@ -66,7 +66,7 @@ namespace ParticleSDKTests
 				var exc = Assert.Throws<ArgumentNullException>(() => { cloud.MakeGetRequestAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("method", exc.ParamName);
 				Assert.Throws<ParticleAuthenticationExeption>(() => { cloud.MakeGetRequestAsync("devices").GetAwaiter().GetResult(); });
-				var stats = await cloud.LoginWithUserAsync(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"]);
+				var stats = await cloud.LoginWithUserAsync("test", "test");
 				Assert.IsTrue(stats.Success, "User did not authenticate");
 
 				var results = await cloud.MakeGetRequestAsync("devices");
@@ -87,7 +87,7 @@ namespace ParticleSDKTests
 		{
 			using (var cloud = new ParticleCloud())
 			{
-				var status = await cloud.LoginWithUserAsync(ConfigurationManager.AppSettings["Username"], ConfigurationManager.AppSettings["Password"], 1);
+				var status = await cloud.LoginWithUserAsync("test", "test", 1);
 				Assert.IsTrue(status.Success);
 				await Task.Delay(2000);
 
