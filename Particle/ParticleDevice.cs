@@ -19,7 +19,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+#if WINDOWS_APP
+using Windows.Web.Http;
+#else
 using System.Net.Http;
+using System.Net;
+#endif
 using System.Threading.Tasks;
 
 namespace Particle
@@ -588,17 +593,23 @@ namespace Particle
 			try
 			{
 				var response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
-				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				if (response.StatusCode == HttpStatusCode.Unauthorized)
 				{
 					await cloud.RefreshTokenAsync();
 					response = await cloud.MakeGetRequestAsync($"devices/{Id}/{Uri.EscapeDataString(variable.Name)}");
-					if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					if (response.StatusCode == HttpStatusCode.Unauthorized)
 					{
 						return response.AsResult<Variable>();
 					}
 				}
 
-				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				if (response.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					var tresult = response.Response.SelectToken("result");
 					variable.Value = tresult.Value<Object>().ToString();
@@ -624,7 +635,7 @@ namespace Particle
 					return response.AsResult<Variable>();
 				}
 			}
-			catch(HttpRequestException re)
+			catch(Exception re)
 			{
 				return new Result<Variable>
 				{
@@ -652,7 +663,13 @@ namespace Particle
 			{
 				var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
 
-				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				if (response.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					var returnValue = response.Response.SelectToken("return_value");
 					return new Result<int>(true, (int)returnValue.Value<long>());
@@ -662,7 +679,7 @@ namespace Particle
 					return response.AsResult<int>();
 				}
 			}
-			catch (HttpRequestException re)
+			catch (Exception re)
 			{
 				return new Result<int>
 				{
@@ -683,18 +700,24 @@ namespace Particle
 			try
 			{
 				var response = await cloud.MakeGetRequestAsync($"devices/{Id}");
-				if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+				if (response.StatusCode == HttpStatusCode.Unauthorized)
 				{
 					await cloud.RefreshTokenAsync();
 					response = await cloud.MakeGetRequestAsync($"devices/{Id}");
-					if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+					if (response.StatusCode == HttpStatusCode.Unauthorized)
 					{
 						IsRefreshing = false;
 						return response.AsResult();
 					}
 				}
 
-				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				if (response.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					if (response.Response?.Type == JTokenType.Object)
 					{
@@ -718,7 +741,7 @@ namespace Particle
 					return response.AsResult();
 				}
 			}
-			catch(HttpRequestException re)
+			catch(Exception re)
 			{
 				return new Result
 				{
@@ -740,7 +763,7 @@ namespace Particle
 				var result = await cloud.MakeDeleteRequestWithAuthTestAsync($"devices/{Id}");
 				return result.AsResult();
 			}
-			catch(HttpRequestException re)
+			catch(Exception re)
 			{
 				return new Result
 				{
@@ -766,7 +789,13 @@ namespace Particle
 			try
 			{
 				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
-				if (result.StatusCode == System.Net.HttpStatusCode.OK)
+				if (result.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					var r = result.AsResult();
 					if (String.IsNullOrWhiteSpace(r.Error))
@@ -785,7 +814,7 @@ namespace Particle
 					return result.AsResult();
 				}
 			}
-			catch(HttpRequestException re)
+			catch(Exception re)
 			{
 				return new Result
 				{
@@ -811,7 +840,13 @@ namespace Particle
 			try
 			{
 				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
-				if (result.StatusCode == System.Net.HttpStatusCode.OK)
+				if (result.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					var r = result.AsResult();
 					if (String.IsNullOrWhiteSpace(r.Error))
@@ -825,7 +860,7 @@ namespace Particle
 					return result.AsResult();
 				}
 			}
-			catch(HttpRequestException re)
+			catch(Exception re)
 			{
 				return new Result
 				{
@@ -852,7 +887,13 @@ namespace Particle
 			try
 			{
 				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app_example_id", exampleId));
-				if (result.StatusCode == System.Net.HttpStatusCode.OK)
+				if (result.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					var r = result.AsResult();
 					if (String.IsNullOrWhiteSpace(r.Error))
@@ -866,7 +907,7 @@ namespace Particle
 					return result.AsResult();
 				}
 			}
-			catch (HttpRequestException re)
+			catch (Exception re)
 			{
 				return new Result
 				{

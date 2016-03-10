@@ -18,7 +18,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if WINDOWS_APP
+using Windows.Web.Http;
+#else
 using System.Net;
+#endif
 using Newtonsoft.Json;
 
 namespace Particle

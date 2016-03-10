@@ -21,7 +21,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+#if WINDOWS_APP
+using Windows.Web.Http;
+#else
 using System.Net.Http;
+using System.Net;
+#endif
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,6 +41,28 @@ namespace Particle
 		private HttpClient client;
 		private Uri baseUri;
 		private AuthenticationResults authResults;
+
+		/// <summary>
+		/// Gets the client.
+		/// </summary>
+		/// <value>
+		/// The client.
+		/// </value>
+		protected HttpClient Client
+		{
+			get { return client; }
+		}
+
+		/// <summary>
+		/// Gets the base URI.
+		/// </summary>
+		/// <value>
+		/// The base URI.
+		/// </value>
+		protected Uri BaseUri
+		{
+			get { return baseUri; }
+		}
 
 
 		/// <summary>
@@ -79,7 +106,7 @@ namespace Particle
 		{
 			get
 			{
-				return new Uri(baseUri, "devices/events");
+				return GetFullUrl("devices/events");
 			}
 		}
 
@@ -100,9 +127,21 @@ namespace Particle
 		{
 			this.baseUri = baseUri;
 			client = new HttpClient();
+#if !WINDOWS_APP
 			client.BaseAddress = baseUri;
+#endif
 		}
 
+
+		/// <summary>
+		/// Gets the full URL.
+		/// </summary>
+		/// <param name="method">The method like devices</param>
+		/// <returns></returns>
+		protected virtual Uri GetFullUrl(String method)
+		{
+			return new Uri(baseUri, method);
+		}
 		/// <summary>
 		/// Makes the get request asynchronous to the cloud api
 		/// </summary>
@@ -122,17 +161,22 @@ namespace Particle
 
 
 			client.DefaultRequestHeaders.Clear();
+#if WINDOWS_APP
+			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
+			client.DefaultRequestHeaders.CacheControl.Add(new Windows.Web.Http.Headers.HttpNameValueHeaderValue("NO-CACHE"));
+			var response = await client.GetAsync(GetFullUrl(method));
+#else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 			client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue()
 			{
 				NoCache = true
 			};
 			HttpResponseMessage response = await client.GetAsync(method);
-			var str = await response.Content.ReadAsStringAsync();
+#endif
 			RequestResponse rr = new RequestResponse();
+			var str = await response.Content.ReadAsStringAsync();
 			rr.StatusCode = response.StatusCode;
 			rr.Response = await Task.Run(() => JToken.Parse(str));
-
 			return rr;
 		}
 
@@ -144,7 +188,7 @@ namespace Particle
 		public async Task<RequestResponse> MakeGetRequestWithAuthTestAsync(String method)
 		{
 			var result = await MakeGetRequestAsync(method);
-			if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (result.StatusCode == HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
 				result = await MakeGetRequestAsync(method);
@@ -169,6 +213,16 @@ namespace Particle
 			client.DefaultRequestHeaders.Clear();
 
 			HttpResponseMessage response;
+#if WINDOWS_APP
+			if(arguments != null)
+			{
+				response = await client.PostAsync(GetFullUrl(method), new HttpFormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PostAsync(GetFullUrl(method), null);
+			}
+#else
 			if (arguments != null)
 			{
 				response = await client.PostAsync(method, new FormUrlEncodedContent(arguments));
@@ -177,6 +231,7 @@ namespace Particle
 			{
 				response = await client.PostAsync(method, null);
 			}
+#endif
 			var str = await response.Content.ReadAsStringAsync();
 			RequestResponse rr = new RequestResponse();
 			rr.StatusCode = response.StatusCode;
@@ -205,9 +260,23 @@ namespace Particle
 
 
 			client.DefaultRequestHeaders.Clear();
+#if WINDOWS_APP
+			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
+#else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+#endif
 
 			HttpResponseMessage response;
+#if WINDOWS_APP
+			if (arguments != null)
+			{
+				response = await client.PostAsync(GetFullUrl(method), new HttpFormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PostAsync(GetFullUrl(method), null);
+			}
+#else
 			if (arguments != null)
 			{
 				response = await client.PostAsync(method, new FormUrlEncodedContent(arguments));
@@ -216,6 +285,7 @@ namespace Particle
 			{
 				response = await client.PostAsync(method, null);
 			}
+#endif
 			var str = await response.Content.ReadAsStringAsync();
 			RequestResponse rr = new RequestResponse();
 			rr.StatusCode = response.StatusCode;
@@ -233,7 +303,7 @@ namespace Particle
 		public virtual async Task<RequestResponse> MakePostRequestWithAuthTestAsync(String method, params KeyValuePair<String, String>[] arguments)
 		{
 			var response = await MakePostRequestAsync(method, arguments);
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (response.StatusCode == HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
 				response = await MakePostRequestAsync(method, arguments);
@@ -261,9 +331,23 @@ namespace Particle
 			}
 
 			client.DefaultRequestHeaders.Clear();
+#if WINDOWS_APP
+			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
+#else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+#endif
 
 			HttpResponseMessage response;
+#if WINDOWS_APP
+			if(arguments != null)
+			{
+				response = await client.PutAsync(GetFullUrl(method), new HttpFormUrlEncodedContent(arguments));
+			}
+			else
+			{
+				response = await client.PutAsync(GetFullUrl(method), null);
+			}
+#else
 			if (arguments != null)
 			{
 				response = await client.PutAsync(method, new FormUrlEncodedContent(arguments));
@@ -272,6 +356,7 @@ namespace Particle
 			{
 				response = await client.PutAsync(method, null);
 			}
+#endif
 			var str = await response.Content.ReadAsStringAsync();
 			RequestResponse rr = new RequestResponse();
 			rr.StatusCode = response.StatusCode;
@@ -289,7 +374,7 @@ namespace Particle
 		public virtual async Task<RequestResponse> MakePutRequestWithAuthTestAsync(String method, params KeyValuePair<String, String>[] arguments)
 		{
 			var response = await MakePutRequestAsync(method, arguments);
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (response.StatusCode == HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
 				response = await MakePutRequestAsync(method, arguments);
@@ -316,10 +401,18 @@ namespace Particle
 			}
 
 			client.DefaultRequestHeaders.Clear();
+#if WINDOWS_APP
+			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
+#else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
+#endif
 
 			HttpResponseMessage response;
+#if WINDOWS_APP
+			response = await client.DeleteAsync(GetFullUrl(method));
+#else
 			response = await client.DeleteAsync(method);
+#endif
 			var str = await response.Content.ReadAsStringAsync();
 			RequestResponse rr = new RequestResponse();
 			rr.StatusCode = response.StatusCode;
@@ -336,7 +429,7 @@ namespace Particle
 		public virtual async Task<RequestResponse> MakeDeleteRequestWithAuthTestAsync(String method)
 		{
 			var response = await MakeDeleteRequestAsync(method);
-			if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+			if (response.StatusCode == HttpStatusCode.Unauthorized)
 			{
 				await RefreshTokenAsync();
 				response = await MakeDeleteRequestAsync(method);
@@ -418,7 +511,11 @@ namespace Particle
 			}
 
 			client.DefaultRequestHeaders.Clear();
+#if WINDOWS_APP
+			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("particle:particle")));
+#else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("particle:particle")));
+#endif
 
 			var data = new Dictionary<String, String>();
 			data["grant_type"] = "password";
@@ -430,8 +527,20 @@ namespace Particle
 			b.Path = "/oauth/token";
 			try
 			{
-				var postResults = await client.PostAsync(b.Uri, new FormUrlEncodedContent(data));
-				if (postResults.StatusCode == System.Net.HttpStatusCode.OK)
+				var postResults = await client.PostAsync(b.Uri,
+#if WINDOWS_APP
+					new HttpFormUrlEncodedContent(data)
+#else
+					new FormUrlEncodedContent(data)
+#endif
+					);
+				if (postResults.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					var results = await postResults.Content.ReadAsStringAsync();
 					var ret = await Task.Run(() => JsonConvert.DeserializeObject<AuthenticationResults>(results));
@@ -450,7 +559,7 @@ namespace Particle
 						}
 					}
 				}
-				else if (postResults.StatusCode == System.Net.HttpStatusCode.BadRequest)
+				else if (postResults.StatusCode == HttpStatusCode.BadRequest)
 				{
 					var results = await postResults.Content.ReadAsStringAsync();
 					var ret = await Task.Run(() => JsonConvert.DeserializeObject<Result>(results));
@@ -467,7 +576,7 @@ namespace Particle
 					Error = postResults.StatusCode.ToString()
 				};
 			}
-			catch (HttpRequestException re)
+			catch(Exception re)
 			{
 				return new Result
 				{
@@ -501,7 +610,7 @@ namespace Particle
 
 				return result.AsResult();
 			}
-			catch (HttpRequestException re)
+			catch (Exception re)
 			{
 				return new Result
 				{
@@ -530,7 +639,7 @@ namespace Particle
 
 				return result.AsResult();
 			}
-			catch (HttpRequestException re)
+			catch (Exception re)
 			{
 				return new Result
 				{
@@ -560,7 +669,13 @@ namespace Particle
 			{
 				var response = await MakeGetRequestWithAuthTestAsync("devices");
 
-				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				if (response.StatusCode ==
+#if WINDOWS_APP
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					)
 				{
 					List<ParticleDevice> items = new List<ParticleDevice>();
 					await Task.Run(() =>
@@ -578,7 +693,7 @@ namespace Particle
 					return response.AsResult<List<ParticleDevice>>();
 				}
 			}
-			catch (HttpRequestException re)
+			catch (Exception re)
 			{
 				return new Result<List<ParticleDevice>>(false, new List<ParticleDevice>())
 				{
@@ -636,7 +751,7 @@ namespace Particle
 				var userResult = result.AsResult();
 				return userResult;
 			}
-			catch (HttpRequestException re)
+			catch (Exception re)
 			{
 				return new Result
 				{
