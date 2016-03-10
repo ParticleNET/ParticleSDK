@@ -43,6 +43,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssertHelper.cs" />
     <Compile Include="ParticleCloudMock.cs" />
     <Compile Include="ParticleCloudTests.cs" />
     <Compile Include="ParticleDeviceMock.cs" />

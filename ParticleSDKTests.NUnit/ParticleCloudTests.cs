@@ -16,25 +16,37 @@ limitations under the License.
 using System;
 using Particle;
 using System.Threading.Tasks;
-using System.Net;
 using Newtonsoft.Json.Linq;
+#if NETFX_CORE
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using Windows.Web.Http;
+#else
+using System.Net;
 using NUnit.Framework;
-using System.Configuration;
 using System.Net.Http;
+#endif
 
 namespace ParticleSDKTests
 {
+#if NETFX_CORE
+	[TestClass]
+#else
 	[TestFixture]
+#endif
 	public class ParticleCloudTests
 	{
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task AuthenticationTestAsync()
 		{
 			using (var cloud = new ParticleCloud())
 			{
-				var exc = Assert.Throws<ArgumentNullException>(() => { cloud.LoginWithUserAsync(null, "sadf").GetAwaiter().GetResult(); });
+				var exc = AssertHelper.Throws<ArgumentNullException>(() => { cloud.LoginWithUserAsync(null, "sadf").GetAwaiter().GetResult(); });
 				Assert.AreEqual("username", exc.ParamName);
-				exc = Assert.Throws<ArgumentNullException>(() => { cloud.LoginWithUserAsync("test", null).GetAwaiter().GetResult(); });
+				exc = AssertHelper.Throws<ArgumentNullException>(() => { cloud.LoginWithUserAsync("test", null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("password", exc.ParamName);
 
 				var results = await cloud.LoginWithUserAsync("test@test.com", "test123");
@@ -46,7 +58,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task AuthenticationAsyncHttpRequestExceptionTest()
 		{
 			using (var cloud = new ParticleCloud(new Uri("http://particletest.io")))
@@ -54,23 +70,40 @@ namespace ParticleSDKTests
 				var result = await cloud.LoginWithUserAsync("test", "test");
 				Assert.IsNotNull(result);
 				Assert.IsFalse(result.Success);
+#if NETFX_CORE
+				Assert.AreEqual(@"The text associated with this error code could not be found.
+
+The server name or address could not be resolved
+", result.Error);
+#else
 				Assert.AreEqual("An error occurred while sending the request.", result.Error);
+#endif
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task MakeGetRequestAsyncTest()
 		{
 			using (var cloud = new ParticleCloud())
 			{
-				var exc = Assert.Throws<ArgumentNullException>(() => { cloud.MakeGetRequestAsync(null).GetAwaiter().GetResult(); });
+				var exc = AssertHelper.Throws<ArgumentNullException>(() => { cloud.MakeGetRequestAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("method", exc.ParamName);
-				Assert.Throws<ParticleAuthenticationExeption>(() => { cloud.MakeGetRequestAsync("devices").GetAwaiter().GetResult(); });
+				AssertHelper.Throws<ParticleAuthenticationExeption>(() => { cloud.MakeGetRequestAsync("devices").GetAwaiter().GetResult(); });
 				var stats = await cloud.LoginWithUserAsync("test", "test");
 				Assert.IsTrue(stats.Success, "User did not authenticate");
 
 				var results = await cloud.MakeGetRequestAsync("devices");
-				Assert.AreEqual(HttpStatusCode.OK, results.StatusCode);
+				Assert.AreEqual(
+#if NETFX_CORE
+					HttpStatusCode.Ok
+#else
+					HttpStatusCode.OK
+#endif
+					, results.StatusCode);
 				var jrep = results.Response;
 				Assert.AreEqual(JTokenType.Array, jrep.Type);
 				JArray arr = (JArray)jrep;
@@ -82,7 +115,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RefreshToken_Test()
 		{
 			using (var cloud = new ParticleCloud())
@@ -99,7 +136,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task GetDevicesAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -108,7 +149,11 @@ namespace ParticleSDKTests
 				{
 					return new RequestResponse
 					{
+#if NETFX_CORE
+						StatusCode = HttpStatusCode.Ok,
+#else
 						StatusCode = HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"[
 						{
 							""id"": ""1"",
@@ -160,12 +205,16 @@ namespace ParticleSDKTests
 		}
 
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task GetDevicesAsyncHttpRequestExceptionTest()
 		{
 			using(var cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Error connecting to the server");
+				var ex = new Exception("Error connecting to the server");
 				cloud.RequestCallBack = (t, m, p) =>
 				{
 					throw ex;
@@ -179,7 +228,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task SignupWithUserAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -188,7 +241,11 @@ namespace ParticleSDKTests
 				{
 					return new RequestResponse
 					{
+#if NETFX_CORE
+						StatusCode = HttpStatusCode.Ok,
+#else
 						StatusCode = HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"
 {
 	ok: false,
@@ -197,9 +254,9 @@ namespace ParticleSDKTests
 					};
 				};
 
-				ArgumentNullException e = Assert.Throws<ArgumentNullException>(() => { cloud.SignupWithUserAsync(null, "test").GetAwaiter().GetResult(); });
+				ArgumentNullException e = AssertHelper.Throws<ArgumentNullException>(() => { cloud.SignupWithUserAsync(null, "test").GetAwaiter().GetResult(); });
 				Assert.AreEqual("username", e.ParamName);
-				e = Assert.Throws<ArgumentNullException>(() => { cloud.SignupWithUserAsync("test", null).GetAwaiter().GetResult(); });
+				e = AssertHelper.Throws<ArgumentNullException>(() => { cloud.SignupWithUserAsync("test", null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("password", e.ParamName);
 
 				var result = await cloud.SignupWithUserAsync("test", "test");
@@ -211,7 +268,11 @@ namespace ParticleSDKTests
 				{
 					return new RequestResponse
 					{
+#if NETFX_CORE
+						StatusCode = HttpStatusCode.Ok,
+#else
 						StatusCode = HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"
 {
 	ok: true
@@ -225,12 +286,16 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task SignupWithUserAsyncHttpRequestExceptionTest()
 		{
 			using (var cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Error Connecting to Server");
+				var ex = new Exception("Error Connecting to Server");
 				cloud.RequestCallBack = (t, m, p) =>
 				{
 					throw ex;
@@ -244,7 +309,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RequestPasswordResetAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -262,7 +331,7 @@ namespace ParticleSDKTests
 					};
 				};
 
-				var ex = Assert.Throws<ArgumentNullException>(() => { cloud.RequestPasswordResetAsync(null).GetAwaiter().GetResult(); });
+				var ex = AssertHelper.Throws<ArgumentNullException>(() => { cloud.RequestPasswordResetAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("email", ex.ParamName);
 
 				var result = await cloud.RequestPasswordResetAsync("test");
@@ -274,7 +343,11 @@ namespace ParticleSDKTests
 				{
 					return new RequestResponse
 					{
+#if NETFX_CORE
+						StatusCode = HttpStatusCode.Ok,
+#else
 						StatusCode = HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"
 {
 'ok': true,
@@ -290,12 +363,16 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RequestPasswordResetAsyncHttpRequestExceptionTest()
 		{
 			using (var cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Error connecting to server");
+				var ex = new Exception("Error connecting to server");
 				cloud.RequestCallBack = (t, m, p) =>
 				{
 					throw ex;
@@ -308,7 +385,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task ClaimDeviceAsyncTest()
 		{
 			using (var cloud = new ParticleCloudMock())
@@ -326,7 +407,7 @@ errors: ['device does not exist']
 					};
 				};
 
-				var ex = Assert.Throws<ArgumentNullException>(() => { cloud.ClaimDeviceAsync(null).GetAwaiter().GetResult(); });
+				var ex = AssertHelper.Throws<ArgumentNullException>(() => { cloud.ClaimDeviceAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("deviceId", ex.ParamName);
 
 				var result = await cloud.ClaimDeviceAsync("123");
@@ -355,12 +436,16 @@ errors: ['device does not exist']
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task ClaimDeviceAsyncHttpRequestExceptionTest()
 		{
 			using (var cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Text HttpClient Request Exception");
+				var ex = new Exception("Text HttpClient Request Exception");
 				cloud.RequestCallBack = (t, m, p) =>
 				{
 					throw ex;

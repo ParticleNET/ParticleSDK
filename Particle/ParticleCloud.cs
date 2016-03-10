@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Linq;
 #if WINDOWS_APP
 using Windows.Web.Http;
+using Windows.Web.Http.Filters;
 #else
 using System.Net.Http;
 using System.Net;
@@ -126,8 +127,14 @@ namespace Particle
 		public ParticleCloud(Uri baseUri)
 		{
 			this.baseUri = baseUri;
+#if WINDOWS_APP
+			HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
+			filter.CacheControl.ReadBehavior = HttpCacheReadBehavior.MostRecent;
+			filter.CacheControl.WriteBehavior = HttpCacheWriteBehavior.NoCache;
+			filter.AllowUI = false;
+			client = new HttpClient(filter);
+#else
 			client = new HttpClient();
-#if !WINDOWS_APP
 			client.BaseAddress = baseUri;
 #endif
 		}
