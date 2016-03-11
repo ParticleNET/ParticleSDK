@@ -76,7 +76,15 @@ namespace ParticleSDKTests
 The server name or address could not be resolved
 ", result.Error);
 #else
-				Assert.AreEqual("An error occurred while sending the request.", result.Error);
+				if(Environment.OSVersion.Platform == PlatformID.Unix)
+				{
+					Assert.AreEqual("Error: NameResolutionFailure", result.Error);
+
+				}
+				else
+				{
+					Assert.AreEqual("An error occurred while sending the request.", result.Error);
+				}
 #endif
 			}
 		}
