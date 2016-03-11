@@ -37,5 +37,14 @@ namespace ParticleSDKTests
 			return Assert.Throws<T>(d);
 		}
 #endif
+
+		public static void IsInstanceOf<T>(Object obj)
+		{
+#if NETFX_CORE
+			Assert.IsInstanceOfType(obj, typeof(T));
+#else
+			Assert.IsInstanceOf<T>(obj);
+#endif
+		}
 	}
 }

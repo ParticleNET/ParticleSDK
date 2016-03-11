@@ -13,24 +13,36 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-using NUnit.Framework;
 using Particle;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+#if NETFX_CORE
+using Windows.Web.Http;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+#else
+using NUnit.Framework;
 using System.Net.Http;
-using System.Net.Sockets;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ParticleSDKTests.NUnit
 {
+#if NETFX_CORE
+	[TestClass]
+#else
 	[TestFixture]
+#endif
 	public class ParticleEventManagerTests
 	{
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task ListensToStreamAsyncTest()
 		{
 			ParticleEventManagerMock eventManager = new ParticleEventManagerMock();
@@ -103,26 +115,41 @@ namespace ParticleSDKTests.NUnit
 			}
 		}*/
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task ListenForPublicEventsTest()
 		{
-			var eventManager = new ParticleEventManager(new Uri("https://api.particle.io/v1/events"), System.Environment.GetEnvironmentVariable("ParticleAccessToken"));
-			long eventCount = 0;
-			eventManager.Events += (s, e) =>
+			using (var cloud = new ParticleCloud())
 			{
-				eventCount++;
-				Assert.IsFalse(String.IsNullOrWhiteSpace(e.Event));
-				Assert.IsNotNull(e.Data);
-				Assert.IsNotNull(e.Data.Length > 0);
-			};
+				var status = await cloud.LoginWithUserAsync("test", "test");
+				if (!status.Success)
+				{
+					Assert.Fail("unable to authenticate");
+				}
 
-			eventManager.Start();
-			Assert.IsTrue(eventManager.IsRunning);
-			await Task.Delay(5000);
-			eventManager.Stop();
-			Assert.IsFalse(eventManager.IsRunning);
+				var eventManager = new ParticleEventManager(new Uri("https://api.particle.io/v1/events"),
+					cloud.AccessToken
+					);
+				long eventCount = 0;
+				eventManager.Events += (s, e) =>
+				{
+					eventCount++;
+					Assert.IsFalse(String.IsNullOrWhiteSpace(e.Event));
+					Assert.IsNotNull(e.Data);
+					Assert.IsNotNull(e.Data.Length > 0);
+				};
 
-			Assert.IsTrue(eventCount > 0); // Its possible for this to be 0 but not very likely
+				eventManager.Start();
+				Assert.IsTrue(eventManager.IsRunning);
+				await Task.Delay(5000);
+				eventManager.Stop();
+				Assert.IsFalse(eventManager.IsRunning);
+
+				Assert.IsTrue(eventCount > 0); // Its possible for this to be 0 but not very likely
+			}
 
 		}
 

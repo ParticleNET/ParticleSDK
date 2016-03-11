@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if WINDOWS_UWP
+#if NETFX_CORE
 using Windows.ApplicationModel.Resources;
 #else
 using System.Resources;
@@ -25,7 +25,7 @@ namespace Particle
 		/// </value>
 		public static RH C { get; } = new RH();
 
-#if WINDOWS_UWP
+#if NETFX_CORE
 		private static ResourceLoader loader;
 #else
 		private static ResourceManager loader;
@@ -36,8 +36,8 @@ namespace Particle
 		/// </summary>
 		private RH()
 		{
-#if WINDOWS_UWP
-			var v = loader ?? (loader = new ResourceLoader("Particle.UWP/Resources"));
+#if NETFX_CORE
+			var v = loader ?? (loader = new ResourceLoader("Particle.Win8/Resources"));
 #else
 			var m = loader ?? (loader = new ResourceManager("Particle.Messages", typeof(RH).GetTypeInfo().Assembly));
 #endif

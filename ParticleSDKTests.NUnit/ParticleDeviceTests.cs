@@ -15,20 +15,33 @@ limitations under the License.
  */
 using System;
 using System.Linq;
-using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Particle;
 using System.Threading.Tasks;
-using System.Net.Http;
+#if NETFX_CORE
+using Windows.Web.Http;
+using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+#else
+using NUnit.Framework;
+using System.Net;
+#endif
 using Newtonsoft.Json;
 
 namespace ParticleSDKTests
 {
+#if NETFX_CORE
+	[TestClass]
+#else
 	[TestFixture]
+#endif
 	public class ParticleDeviceTests
 	{
 #if DEBUG
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public void ParseExceptionTest()
 		{
 			var p = new ParticleDeviceMock(new JObject());
@@ -60,19 +73,23 @@ namespace ParticleSDKTests
 
 
 			obj = JObject.Parse(json);
-			var ex = Assert.Throws<ParticleParseException>(() => p.ParseObjectMock(obj));
+			var ex = AssertHelper.Throws<ParticleParseException>(() => p.ParseObjectMock(obj));
 			Assert.AreEqual("Error parsing.", ex.Message);
 			Assert.IsFalse(String.IsNullOrWhiteSpace(ex.SourceJson));
 			Assert.IsNotNull(ex.InnerException);
-			Assert.IsInstanceOf<JsonException>(ex.InnerException);
+			AssertHelper.IsInstanceOf<JsonException>(ex.InnerException);
 		}
 #endif
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public void ParseTest()
 		{
 			var p = new ParticleDeviceMock(new JObject());
-			var message = Assert.Throws<ArgumentNullException>(() => { p.ParseObjectMock(null); });
+			var message = AssertHelper.Throws<ArgumentNullException>(() => { p.ParseObjectMock(null); });
 			Assert.AreEqual("obj", message.ParamName);
 
 			var obj = JObject.Parse(@"{'id':'3a', 'name':null}");
@@ -130,11 +147,15 @@ namespace ParticleSDKTests
 			Assert.AreEqual("led2", functions[1]);
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public void ParseElectronTest()
 		{
 			var p = new ParticleDeviceMock(new JObject());
-			var message = Assert.Throws<ArgumentNullException>(() => { p.ParseObjectMock(null); });
+			var message = AssertHelper.Throws<ArgumentNullException>(() => { p.ParseObjectMock(null); });
 			Assert.AreEqual("obj", message.ParamName);
 
 			var obj = JObject.Parse(@"{'id':'3a', 'name':null}");
@@ -196,7 +217,11 @@ namespace ParticleSDKTests
 			Assert.AreEqual("led2", functions[1]);
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RefreshAsyncTest()
 		{
 			ParticleCloudMock cloud = new ParticleCloudMock();
@@ -206,7 +231,12 @@ namespace ParticleSDKTests
 				Assert.AreEqual("devices/3", b);
 				return new RequestResponse
 				{
-					StatusCode = System.Net.HttpStatusCode.OK,
+					StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 					Response = JToken.Parse(@"{'id': '3',
 	'name': 'Work',
 	'last_app': 'cheese',
@@ -254,12 +284,16 @@ namespace ParticleSDKTests
 			Assert.AreEqual("led2", functions[1]);
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RefreshAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Unable to resolve dns");
+				var ex = new Exception("Unable to resolve dns");
 				cloud.RequestCallBack = (a, b, c) =>
 				{
 					throw ex;
@@ -274,7 +308,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task GetVariableValueAsyncTest()
 		{
 			ParticleCloudMock cloud = new ParticleCloudMock();
@@ -284,7 +322,12 @@ namespace ParticleSDKTests
 				Assert.AreEqual("devices/3/temp", b);
 				return new RequestResponse
 				{
-					StatusCode = System.Net.HttpStatusCode.OK,
+					StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 					Response = JToken.Parse(@"{'name': 'temp',
   'result': 300,
   'coreInfo': {
@@ -299,9 +342,9 @@ namespace ParticleSDKTests
 
 			var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'variables':{'temp':'int'}}"));
 
-			var ex = Assert.Throws<ArgumentNullException>(() => { p.GetVariableValueAsync((String)null).GetAwaiter().GetResult(); });
+			var ex = AssertHelper.Throws<ArgumentNullException>(() => { p.GetVariableValueAsync((String)null).GetAwaiter().GetResult(); });
 			Assert.AreEqual("variable", ex.ParamName);
-			ex = Assert.Throws<ArgumentNullException>(() => { p.GetVariableValueAsync((Variable)null).GetAwaiter().GetResult(); });
+			ex = AssertHelper.Throws<ArgumentNullException>(() => { p.GetVariableValueAsync((Variable)null).GetAwaiter().GetResult(); });
 			Assert.AreEqual("variable", ex.ParamName);
 
 			var results = await p.GetVariableValueAsync("temp");
@@ -317,7 +360,12 @@ namespace ParticleSDKTests
 				Assert.AreEqual("devices/3/temp", b);
 				return new RequestResponse
 				{
-					StatusCode = System.Net.HttpStatusCode.OK,
+					StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 					Response = JToken.Parse(@"{'name': 'temp',
   'result': 23,
   'coreInfo': {
@@ -339,12 +387,16 @@ namespace ParticleSDKTests
 		}
 
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task GetVariableValueAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Unable to resolve");
+				var ex = new Exception("Unable to resolve");
 				cloud.RequestCallBack = (a, b, c) =>
 				{
 					throw ex;
@@ -360,7 +412,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task CallFunctionAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -376,7 +432,12 @@ namespace ParticleSDKTests
 					Assert.AreEqual("on", first.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
   'id': '3',
   'name': 'led',
@@ -388,7 +449,7 @@ namespace ParticleSDKTests
 				};
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test', 'functions':['led']}"));
-				var exc = Assert.Throws<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
+				var exc = AssertHelper.Throws<ArgumentNullException>(() => { p.CallFunctionAsync(null, "").GetAwaiter().GetResult(); });
 				Assert.AreEqual("functionName", exc.ParamName);
 				var result = await p.CallFunctionAsync("led", "on");
 				Assert.IsTrue(result.Success);
@@ -396,12 +457,16 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task CallFunctionAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Unable to Resolve");
+				var ex = new Exception("Unable to Resolve");
 				cloud.RequestCallBack = (a, b, c) =>
 				{
 					throw ex;
@@ -415,7 +480,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task UnclaimAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -426,7 +495,7 @@ namespace ParticleSDKTests
 					Assert.AreEqual("devices/3", b);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.Forbidden,
+						StatusCode = HttpStatusCode.Forbidden,
 						Response = JToken.Parse(@"{
 		  'error': 'Permission Denied',
 		  'info': 'I didn\'t recognize that device name or ID, try opening https://api.particle.io/v1/devices?access_token=...'
@@ -446,7 +515,12 @@ namespace ParticleSDKTests
 				{
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
 	  'ok': true
 	}")
@@ -460,12 +534,16 @@ namespace ParticleSDKTests
 		}
 
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task UnclaimAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Unable to resolve");
+				var ex = new Exception("Unable to resolve");
 				cloud.RequestCallBack = (a, b, c) =>
 				{
 					throw ex;
@@ -481,7 +559,11 @@ namespace ParticleSDKTests
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RenameAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -496,7 +578,12 @@ namespace ParticleSDKTests
 					Assert.AreEqual("newTest", p1.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
 		  'error': 'Nothing to do?'
 		}")
@@ -505,7 +592,7 @@ namespace ParticleSDKTests
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
 
-				var exc = Assert.Throws<ArgumentNullException>(() => { p.RenameAsync(null).GetAwaiter().GetResult(); });
+				var exc = AssertHelper.Throws<ArgumentNullException>(() => { p.RenameAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("newName", exc.ParamName);
 
 				var result = await p.RenameAsync("newTest");
@@ -523,7 +610,12 @@ namespace ParticleSDKTests
 					Assert.AreEqual("newTest", p1.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
 name: 'newTest',
 id: '1234'
@@ -537,12 +629,16 @@ id: '1234'
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task RenameAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Unable to resolve");
+				var ex = new Exception("Unable to resolve");
 				cloud.RequestCallBack = (a, b, c) =>
 				{
 					throw ex;
@@ -557,7 +653,11 @@ id: '1234'
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task FlashKnownAppAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -572,7 +672,12 @@ id: '1234'
 					Assert.AreEqual("newTest", p1.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
 			  'ok': false,
 			  'code': 500,
@@ -585,7 +690,7 @@ id: '1234'
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
 
-				var exc = Assert.Throws<ArgumentNullException>(() => { p.FlashKnownAppAsync(null).GetAwaiter().GetResult(); });
+				var exc = AssertHelper.Throws<ArgumentNullException>(() => { p.FlashKnownAppAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("appName", exc.ParamName);
 
 				var result = await p.FlashKnownAppAsync("newTest");
@@ -603,7 +708,12 @@ id: '1234'
 					Assert.AreEqual("tinker", p1.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
   'id': '3',
   'status': 'Update started'
@@ -618,7 +728,11 @@ id: '1234'
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task FlashExampleAppAsyncTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
@@ -633,7 +747,12 @@ id: '1234'
 					Assert.AreEqual("56214d636666d9ece3000001", p1.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
 			  'ok': false,
 			  'code': 500,
@@ -646,7 +765,7 @@ id: '1234'
 
 				var p = new ParticleDeviceMock(cloud, JObject.Parse("{'id':'3', 'name': 'test'}"));
 
-				var exc = Assert.Throws<ArgumentNullException>(() => { p.FlashExampleAppAsync(null).GetAwaiter().GetResult(); });
+				var exc = AssertHelper.Throws<ArgumentNullException>(() => { p.FlashExampleAppAsync(null).GetAwaiter().GetResult(); });
 				Assert.AreEqual("exampleId", exc.ParamName);
 
 				var result = await p.FlashExampleAppAsync("56214d636666d9ece3000001");
@@ -664,7 +783,12 @@ id: '1234'
 					Assert.AreEqual("56214d636666d9ece3000006", p1.Value);
 					return new RequestResponse
 					{
-						StatusCode = System.Net.HttpStatusCode.OK,
+						StatusCode =
+#if NETFX_CORE
+					HttpStatusCode.Ok,
+#else
+					HttpStatusCode.OK,
+#endif
 						Response = JToken.Parse(@"{
   'id': '3',
   'status': 'Update started'
@@ -679,12 +803,16 @@ id: '1234'
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public async Task FlashKnownAppAsyncHttpRequestExceptionTest()
 		{
 			using (ParticleCloudMock cloud = new ParticleCloudMock())
 			{
-				var ex = new HttpRequestException("Unable to resolve");
+				var ex = new Exception("Unable to resolve");
 				cloud.RequestCallBack = (a, b, c) =>
 				{
 					throw ex;
@@ -699,7 +827,11 @@ id: '1234'
 			}
 		}
 
+#if NETFX_CORE
+		[TestMethod]
+#else
 		[Test]
+#endif
 		public void LastHeardDateTest()
 		{
 			using (var cloud = new ParticleCloud())

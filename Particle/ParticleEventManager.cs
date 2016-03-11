@@ -19,7 +19,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+#if NETFX_CORE
+using Windows.Web.Http;
+using Windows.Web.Http.Filters;
+#else
 using System.Net.Http;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,12 +75,14 @@ namespace Particle
 		/// Occurs when we stop listening to events
 		/// </summary>
 		public event Action Closed;
+#if !NETFX_CORE
 		/// <summary>
 		/// How long in Milliseconds to wait before a read timeout occurs
 		/// If ReadTimeout is set to 0 Timeout is not set. On Windows Phone the stream does not support this timeout on the stream.
-		/// Default: 0
+		/// Default: 36000
 		/// </summary>
-		public int ReadTimeout { get; set; } = 0;
+		public int ReadTimeout { get; set; } = 36000;
+#endif
 		/// <summary>
 		/// How long to delay before reconnecting after being disconnected in Milliseconds
 		/// Default: 1000
@@ -161,6 +168,38 @@ namespace Particle
 		/// <returns>A Task that can be awaited</returns>
 		protected virtual async Task ConnectToClient()
 		{
+#if NETFX_CORE
+			HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
+			filter.CacheControl.ReadBehavior = HttpCacheReadBehavior.MostRecent;
+			filter.CacheControl.WriteBehavior = HttpCacheWriteBehavior.NoCache;
+			filter.AllowUI = false;
+			using (HttpClient client = new HttpClient())
+			{
+				if (hasConnected)
+				{
+					Reconnecting?.Invoke();
+				}
+				client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", accessToken);
+				using (var result = await client.GetInputStreamAsync(streamUri))
+				{
+					
+					if (!hasConnected)
+					{
+						Connected?.Invoke();
+						hasConnected = true;
+					}
+					else
+					{
+						Reconnected?.Invoke();
+					}
+
+					using (var s = result.AsStreamForRead())
+					{
+						await ListensToStreamAsync(s);
+					}
+				}
+			}
+#else
 			using (HttpClient client = new HttpClient())
 			{
 				if(hasConnected)
@@ -186,6 +225,7 @@ namespace Particle
 					await ListensToStreamAsync(stream).ConfigureAwait(true);
 				}
 			}
+#endif
 		}
 
 		/// <summary>

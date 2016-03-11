@@ -124,6 +124,21 @@
     <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleCloudTests.cs">
       <Link>ParticleCloudTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleDeviceMock.cs">
+      <Link>ParticleDeviceMock.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleDeviceTests.cs">
+      <Link>ParticleDeviceTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleEventManagerMock.cs">
+      <Link>ParticleEventManagerMock.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleEventManagerTests.cs">
+      <Link>ParticleEventManagerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\ParticleSDKTests.NUnit\RHTests.cs">
+      <Link>RHTests.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
