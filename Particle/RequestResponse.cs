@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 using Windows.Web.Http;
 #else
 using System.Net;

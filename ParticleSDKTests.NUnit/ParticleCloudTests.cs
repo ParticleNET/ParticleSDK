@@ -70,11 +70,13 @@ namespace ParticleSDKTests
 				var result = await cloud.LoginWithUserAsync("test", "test");
 				Assert.IsNotNull(result);
 				Assert.IsFalse(result.Success);
-#if NETFX_CORE
+#if WINDOWS_PHONE
 				Assert.AreEqual(@"The text associated with this error code could not be found.
 
 The server name or address could not be resolved
 ", result.Error);
+#elif WINDOWS_PHONE_APP
+				Assert.AreEqual("Exception from HRESULT: 0x80072EE7", result.Error);
 #else
 				if(Environment.OSVersion.Platform == PlatformID.Unix)
 				{

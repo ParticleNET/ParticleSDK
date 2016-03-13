@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 using Windows.Web.Http;
 #else
 using System.Net;

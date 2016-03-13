@@ -40,6 +40,9 @@ namespace Particle
 #if WINDOWS_APP_81
 			var v = loader ?? (loader = ResourceLoader.GetForViewIndependentUse("Particle.Win8/Resources"));
 #endif
+#if WINDOWS_PHONE_APP
+			var v = loader ?? (loader = ResourceLoader.GetForViewIndependentUse("Particle.WP8/Resources"));
+#endif
 #else
 			var m = loader ?? (loader = new ResourceManager("Particle.Messages", typeof(RH).GetTypeInfo().Assembly));
 #endif

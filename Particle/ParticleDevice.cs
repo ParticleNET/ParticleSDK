@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 using Windows.Web.Http;
 #else
 using System.Net.Http;
@@ -604,7 +604,7 @@ namespace Particle
 				}
 
 				if (response.StatusCode ==
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
@@ -664,7 +664,7 @@ namespace Particle
 				var response = await cloud.MakePostRequestWithAuthTestAsync($"devices/{Id}/{Uri.EscapeUriString(functionName)}", new KeyValuePair<string, string>("arg", arg));
 
 				if (response.StatusCode ==
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
@@ -712,7 +712,7 @@ namespace Particle
 				}
 
 				if (response.StatusCode ==
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
@@ -790,7 +790,7 @@ namespace Particle
 			{
 				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("name", newName));
 				if (result.StatusCode ==
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
@@ -841,7 +841,7 @@ namespace Particle
 			{
 				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app", appName));
 				if (result.StatusCode ==
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
@@ -888,7 +888,7 @@ namespace Particle
 			{
 				var result = await cloud.MakePutRequestWithAuthTestAsync($"devices/{Id}", new KeyValuePair<string, string>("app_example_id", exampleId));
 				if (result.StatusCode ==
-#if WINDOWS_APP
+#if WINDOWS_APP || WINDOWS_PHONE_APP
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
