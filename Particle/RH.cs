@@ -37,7 +37,9 @@ namespace Particle
 		private RH()
 		{
 #if NETFX_CORE
-			var v = loader ?? (loader = new ResourceLoader("Particle.Win8/Resources"));
+#if WINDOWS_APP_81
+			var v = loader ?? (loader = ResourceLoader.GetForViewIndependentUse("Particle.Win8/Resources"));
+#endif
 #else
 			var m = loader ?? (loader = new ResourceManager("Particle.Messages", typeof(RH).GetTypeInfo().Assembly));
 #endif
