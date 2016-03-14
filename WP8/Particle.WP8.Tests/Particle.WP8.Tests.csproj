@@ -73,28 +73,28 @@
     <SDKReference Include="TestPlatform, Version=14.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\AssertHelper.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\AssertHelper.cs">
       <Link>AssertHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleCloudMock.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\ParticleCloudMock.cs">
       <Link>ParticleCloudMock.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleCloudTests.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\ParticleCloudTests.cs">
       <Link>ParticleCloudTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleDeviceMock.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\ParticleDeviceMock.cs">
       <Link>ParticleDeviceMock.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleDeviceTests.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\ParticleDeviceTests.cs">
       <Link>ParticleDeviceTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleEventManagerMock.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\ParticleEventManagerMock.cs">
       <Link>ParticleEventManagerMock.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\ParticleEventManagerTests.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\ParticleEventManagerTests.cs">
       <Link>ParticleEventManagerTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\ParticleSDKTests.NUnit\RHTests.cs">
+    <Compile Include="..\..\NET\Particle.NET.Tests.NUnit\RHTests.cs">
       <Link>RHTests.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

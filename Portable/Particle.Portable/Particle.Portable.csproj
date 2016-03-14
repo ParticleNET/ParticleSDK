@@ -40,81 +40,6 @@
     <DocumentationFile>bin\Release\Particle.Portable.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\Particle\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Messages.Designer.cs">
-      <Link>Messages.Designer.cs</Link>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Messages.resx</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleAuthenticationExeption.cs">
-      <Link>ParticleAuthenticationExeption.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleBase.cs">
-      <Link>ParticleBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleCloud.cs">
-      <Link>ParticleCloud.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleDevice.cs">
-      <Link>ParticleDevice.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleDeviceType.cs">
-      <Link>ParticleDeviceType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleDoc.cs">
-      <Link>ParticleDoc.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleEventData.cs">
-      <Link>ParticleEventData.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleEventManager.cs">
-      <Link>ParticleEventManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleException.cs">
-      <Link>ParticleException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleParseException.cs">
-      <Link>ParticleParseException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Properties\AssemblyInfo.cs">
-      <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Properties\AssemblyVersion.cs">
-      <Link>Properties\AssemblyVersion.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\RequestResponse.cs">
-      <Link>RequestResponse.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Result.cs">
-      <Link>Result.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Results\AuthenticationResults.cs">
-      <Link>Results\AuthenticationResults.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\RH.cs">
-      <Link>RH.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Variable.cs">
-      <Link>Variable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\VariableType.cs">
-      <Link>VariableType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\WebEventArgs.cs">
-      <Link>WebEventArgs.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\Particle\Messages.resx">
-      <Link>Messages.resx</Link>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -133,10 +58,82 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\LICENSE">
-      <Link>LICENSE</Link>
-    </EmbeddedResource>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\NET\Particle.NET\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Messages.Designer.cs">
+      <Link>Messages.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Messages.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleAuthenticationExeption.cs">
+      <Link>ParticleAuthenticationExeption.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleBase.cs">
+      <Link>ParticleBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleCloud.cs">
+      <Link>ParticleCloud.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleDevice.cs">
+      <Link>ParticleDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleDeviceType.cs">
+      <Link>ParticleDeviceType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleDoc.cs">
+      <Link>ParticleDoc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleEventData.cs">
+      <Link>ParticleEventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleEventManager.cs">
+      <Link>ParticleEventManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleException.cs">
+      <Link>ParticleException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleParseException.cs">
+      <Link>ParticleParseException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Properties\AssemblyVersion.cs">
+      <Link>Properties\AssemblyVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\RequestResponse.cs">
+      <Link>RequestResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Result.cs">
+      <Link>Result.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Results\AuthenticationResults.cs">
+      <Link>Results\AuthenticationResults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\RH.cs">
+      <Link>RH.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Variable.cs">
+      <Link>Variable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\VariableType.cs">
+      <Link>VariableType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\WebEventArgs.cs">
+      <Link>WebEventArgs.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\NET\Particle.NET\Messages.resx">
+      <Link>Messages.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Messages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

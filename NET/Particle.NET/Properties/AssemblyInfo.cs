@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ParticleSDK")]
-[assembly: AssemblyCopyright("Copyright © ParticleNET 2015")]
+[assembly: AssemblyCopyright("Copyright © ParticleNET 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]

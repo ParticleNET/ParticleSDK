@@ -70,7 +70,7 @@ namespace ParticleSDKTests
 				var result = await cloud.LoginWithUserAsync("test", "test");
 				Assert.IsNotNull(result);
 				Assert.IsFalse(result.Success);
-#if WINDOWS_PHONE
+#if WINDOWS_APP || WINDOWS_UWP
 				Assert.AreEqual(@"The text associated with this error code could not be found.
 
 The server name or address could not be resolved
@@ -78,7 +78,7 @@ The server name or address could not be resolved
 #elif WINDOWS_PHONE_APP
 				Assert.AreEqual("Exception from HRESULT: 0x80072EE7", result.Error);
 #else
-				if(Environment.OSVersion.Platform == PlatformID.Unix)
+				if (Environment.OSVersion.Platform == PlatformID.Unix)
 				{
 					Assert.AreEqual("Error: NameResolutionFailure", result.Error);
 

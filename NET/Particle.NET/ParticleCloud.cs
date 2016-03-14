@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 #else
@@ -127,7 +127,7 @@ namespace Particle
 		public ParticleCloud(Uri baseUri)
 		{
 			this.baseUri = baseUri;
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
 			filter.CacheControl.ReadBehavior = HttpCacheReadBehavior.MostRecent;
 			filter.CacheControl.WriteBehavior = HttpCacheWriteBehavior.NoCache;
@@ -168,7 +168,7 @@ namespace Particle
 
 
 			client.DefaultRequestHeaders.Clear();
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
 			client.DefaultRequestHeaders.CacheControl.Add(new Windows.Web.Http.Headers.HttpNameValueHeaderValue("NO-CACHE"));
 			var response = await client.GetAsync(GetFullUrl(method));
@@ -220,7 +220,7 @@ namespace Particle
 			client.DefaultRequestHeaders.Clear();
 
 			HttpResponseMessage response;
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			if (arguments != null)
 			{
 				response = await client.PostAsync(GetFullUrl(method), new HttpFormUrlEncodedContent(arguments));
@@ -267,14 +267,14 @@ namespace Particle
 
 
 			client.DefaultRequestHeaders.Clear();
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
 #else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 #endif
 
 			HttpResponseMessage response;
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			if (arguments != null)
 			{
 				response = await client.PostAsync(GetFullUrl(method), new HttpFormUrlEncodedContent(arguments));
@@ -338,14 +338,14 @@ namespace Particle
 			}
 
 			client.DefaultRequestHeaders.Clear();
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
 #else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 #endif
 
 			HttpResponseMessage response;
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			if (arguments != null)
 			{
 				response = await client.PutAsync(GetFullUrl(method), new HttpFormUrlEncodedContent(arguments));
@@ -408,14 +408,14 @@ namespace Particle
 			}
 
 			client.DefaultRequestHeaders.Clear();
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Bearer", AccessToken);
 #else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authResults.AccessToken);
 #endif
 
 			HttpResponseMessage response;
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			response = await client.DeleteAsync(GetFullUrl(method));
 #else
 			response = await client.DeleteAsync(method);
@@ -518,7 +518,7 @@ namespace Particle
 			}
 
 			client.DefaultRequestHeaders.Clear();
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 			client.DefaultRequestHeaders.Authorization = new Windows.Web.Http.Headers.HttpCredentialsHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("particle:particle")));
 #else
 			client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes("particle:particle")));
@@ -535,14 +535,14 @@ namespace Particle
 			try
 			{
 				var postResults = await client.PostAsync(b.Uri,
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 					new HttpFormUrlEncodedContent(data)
 #else
 					new FormUrlEncodedContent(data)
 #endif
 					);
 				if (postResults.StatusCode ==
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK
@@ -677,7 +677,7 @@ namespace Particle
 				var response = await MakeGetRequestWithAuthTestAsync("devices");
 
 				if (response.StatusCode ==
-#if WINDOWS_APP || WINDOWS_PHONE_APP
+#if NETFX_CORE
 					HttpStatusCode.Ok
 #else
 					HttpStatusCode.OK

@@ -79,80 +79,80 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Compile Include="..\..\Particle\Extensions.cs">
-      <Link>Extensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleAuthenticationExeption.cs">
-      <Link>ParticleAuthenticationExeption.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleBase.cs">
-      <Link>ParticleBase.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleCloud.cs">
-      <Link>ParticleCloud.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleDevice.cs">
-      <Link>ParticleDevice.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleDeviceType.cs">
-      <Link>ParticleDeviceType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleDoc.cs">
-      <Link>ParticleDoc.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleEventData.cs">
-      <Link>ParticleEventData.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleEventManager.cs">
-      <Link>ParticleEventManager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleException.cs">
-      <Link>ParticleException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\ParticleParseException.cs">
-      <Link>ParticleParseException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Properties\AssemblyInfo.cs">
-      <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Properties\AssemblyVersion.cs">
-      <Link>Properties\AssemblyVersion.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\RequestResponse.cs">
-      <Link>RequestResponse.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Result.cs">
-      <Link>Result.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Results\AuthenticationResults.cs">
-      <Link>Results\AuthenticationResults.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\RH.cs">
-      <Link>RH.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\Variable.cs">
-      <Link>Variable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\VariableType.cs">
-      <Link>VariableType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Particle\WebEventArgs.cs">
-      <Link>WebEventArgs.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\portable-net45+wp80+win8+wpa81+dnxcore50\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PRIResource Include="..\..\Win 8\Particle.Win8\Resources\en-US\Resources.resw">
+    <PRIResource Include="..\..\Win8\Particle.Win8\Resources\en-US\Resources.resw">
       <Link>Resources\en-US\Resources.resw</Link>
     </PRIResource>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\NET\Particle.NET\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleAuthenticationExeption.cs">
+      <Link>ParticleAuthenticationExeption.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleBase.cs">
+      <Link>ParticleBase.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleCloud.cs">
+      <Link>ParticleCloud.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleDevice.cs">
+      <Link>ParticleDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleDeviceType.cs">
+      <Link>ParticleDeviceType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleDoc.cs">
+      <Link>ParticleDoc.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleEventData.cs">
+      <Link>ParticleEventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleEventManager.cs">
+      <Link>ParticleEventManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleException.cs">
+      <Link>ParticleException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\ParticleParseException.cs">
+      <Link>ParticleParseException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Properties\AssemblyVersion.cs">
+      <Link>Properties\AssemblyVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\RequestResponse.cs">
+      <Link>RequestResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Result.cs">
+      <Link>Result.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Results\AuthenticationResults.cs">
+      <Link>Results\AuthenticationResults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\RH.cs">
+      <Link>RH.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\Variable.cs">
+      <Link>Variable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\VariableType.cs">
+      <Link>VariableType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\NET\Particle.NET\WebEventArgs.cs">
+      <Link>WebEventArgs.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
