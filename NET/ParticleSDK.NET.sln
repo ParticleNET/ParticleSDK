@@ -5,17 +5,16 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{24FC2040-8351-48FD-8A30-B4C4BB9098CF}"
 	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
-		CurrentReleaseNotes.txt = CurrentReleaseNotes.txt
-		LICENSE = LICENSE
-		nuspec\ParticleNET.ParticleSDK.nuspec = nuspec\ParticleNET.ParticleSDK.nuspec
-		PreviousReleaseNotes.txt = PreviousReleaseNotes.txt
-		README.md = README.md
+		..\.gitignore = ..\.gitignore
+		..\CurrentReleaseNotes.txt = ..\CurrentReleaseNotes.txt
+		..\LICENSE = ..\LICENSE
+		..\PreviousReleaseNotes.txt = ..\PreviousReleaseNotes.txt
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Particle", "Particle\Particle.csproj", "{1508DC12-3E8F-4028-8532-8D5B99DB10C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Particle.NET", "Particle.NET\Particle.NET.csproj", "{1508DC12-3E8F-4028-8532-8D5B99DB10C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParticleSDKTests.NUnit", "ParticleSDKTests.NUnit\ParticleSDKTests.NUnit.csproj", "{A561F883-C6A0-406E-9D29-C2A3DD059ED6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Particle.NET.Tests.NUnit", "Particle.NET.Tests.NUnit\Particle.NET.Tests.NUnit.csproj", "{A561F883-C6A0-406E-9D29-C2A3DD059ED6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
