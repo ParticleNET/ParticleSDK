@@ -1,3 +1,7 @@
+0.8.17-beta-0032 
+-Disabled Caching in HttpClient
+-Updated Logic on ParticleEventManager so were not setting time out on windows phone
+
 0.8.14
 -Added class for loading resource messages.
 -Added some exception wrapping around Parsing so developers can see the offending json
