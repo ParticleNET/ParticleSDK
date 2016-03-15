@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+	<metadata>
+		<id>ParticleNET.ParticleSDK.Portable</id>
+		<version>0.7.9-beta01</version>
+		<title>ParticleSDK</title>
+		<authors>adam holt</authors>
+		<owners>ParticleNET</owners>
+		<licenseUrl>https://github.com/ParticleNET/ParticleSDK/blob/master/LICENSE</licenseUrl>
+		<projectUrl>https://github.com/ParticleNET/ParticleSDK</projectUrl>
+		<iconUrl>https://raw.githubusercontent.com/ParticleNET/ParticleSDK/master/nuspec/icon.png</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>A wrapper around the Particle.io (formally spark.io) cloud api. Supporting .net 4.5, Windows Runtime 8, and Windows Phone 8.</description>
+		<tags>Spark, Spark.io, Particle, Particle.io, ParticleNET</tags>
+		<dependencies>
+			<dependency id="Newtonsoft.Json" version="7.0.1" />
+			<dependency id="Microsoft.Net.Http" version="2.2.29" />
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\Build\Portable\Any CPU\Particle.Portable.dll" target="lib\portable-net45+wp80+win8+wpa81\Particle.Portable.dll" />
+		<file src="..\Build\Portable\Any CPU\Particle.Portable.xml" target="lib\portable-net45+wp80+win8+wpa81\Particle.Portable.xml" />
+	</files>
+</package>

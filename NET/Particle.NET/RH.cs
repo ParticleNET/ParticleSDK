@@ -13,7 +13,7 @@ using System.Reflection;
 namespace Particle
 {
 	/// <summary>
-	/// A class to help get items located in the Resource files. This class is not meant to be used outside of the Particle SDK and is only left open so its easier to test with a unit test.
+	/// A class to help get items located in the Resource files. This class is not meant to be used outside of the Particle SDK.
 	/// </summary>
 	internal class RH
 	{
@@ -37,7 +37,7 @@ namespace Particle
 		private RH()
 		{
 #if NETFX_CORE
-#if WINDOWS_APP_81
+#if WINDOWS_APP
 			var v = loader ?? (loader = ResourceLoader.GetForViewIndependentUse("Particle.Win8/Resources"));
 #elif WINDOWS_PHONE_APP
 			var v = loader ?? (loader = ResourceLoader.GetForViewIndependentUse("Particle.WP8/Resources"));

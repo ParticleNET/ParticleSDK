@@ -53,10 +53,6 @@
       <Project>{987b4815-eed0-4c8c-870f-15d635ce7d6c}</Project>
       <Name>Particle.Portable</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Particle\Particle.csproj">
-      <Project>{1508dc12-3e8f-4028-8532-8d5b99db10c7}</Project>
-      <Name>Particle</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
