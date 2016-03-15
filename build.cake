@@ -172,6 +172,5 @@ Task("AppVeyorArtifact")
 Task("Default")
 	.IsDependentOn("Build")
 	.IsDependentOn("SignAssembly")
-	.IsDependentOn("NuGetPack")
-	.IsDependentOn("AppVeyorArtifact");
+	.IsDependentOn("NuGetPack");
 RunTarget(target);
