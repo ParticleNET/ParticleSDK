@@ -7,7 +7,7 @@
 .NET SDK for Particle.io (formally spark.io)
 
 ### Framework Specific Versions
-Native Library for UWP/UAP, Windows 8.1, Windows Phone 8.1, .NET 4.5. Should also work with mono and Xamarin but not tested. Using Framework Specific version of HttpClient.
+Native Library for UWP/UAP, Windows 8.1, Windows Phone 8.1, .NET 4.5. Using Framework Specific version of HttpClient.
 ```
 Install-Package ParticleNET.ParticleSDK -Pre
 ```
