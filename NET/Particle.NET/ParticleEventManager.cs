@@ -36,7 +36,7 @@ namespace Particle
 	public class ParticleEventManager
 	{
 		/// <summary>
-		/// Used to determen if we should keep running.
+		/// Used to determent if we should keep running.
 		/// 
 		/// If this is false we keep restarting and connecting to the event service
 		/// If this is true stop listening to the event service
