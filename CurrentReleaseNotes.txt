@@ -1,2 +1,3 @@
 -Changed the main nuget package to no longer be a portable library but instead have assemblies for .NET 4.5, WP8.1, Win8.1, and UAP 10
 -Added Portable nuget package.
+-Updated ParticleEventManager to try and remove the need for Task.Run in destination app
