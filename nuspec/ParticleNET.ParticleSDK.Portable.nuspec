@@ -3,7 +3,7 @@
 	<metadata>
 		<id>ParticleNET.ParticleSDK.Portable</id>
 		<version>0.7.9-beta01</version>
-		<title>ParticleSDK</title>
+		<title>ParticleSDK Portable</title>
 		<authors>adam holt</authors>
 		<owners>ParticleNET</owners>
 		<licenseUrl>https://github.com/ParticleNET/ParticleSDK/blob/master/LICENSE</licenseUrl>
