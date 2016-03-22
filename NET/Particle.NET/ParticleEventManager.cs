@@ -143,16 +143,26 @@ namespace Particle
 		/// <summary>
 		/// Starts listening to the events coming in from the specified stream
 		/// </summary>
-		public async void Start()
+		public void Start()
 		{
 			_stop = false;
+			Task.Factory.StartNew(()=>StartAsync().ConfigureAwait(false), TaskCreationOptions.LongRunning);
+			
+		}
+
+		/// <summary>
+		/// Start the connection loop to connect to the event api.
+		/// </summary>
+		/// <returns></returns>
+		protected virtual async Task StartAsync()
+		{
 			while (!_stop) // If we have not been told to stop reconnect to the stream if an exception has occurred
 			{
 				try
 				{
 					await ConnectToClient();
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					Error?.Invoke(ex);
 					await Task.Delay(ReconnectDelay); // try to delay restart so we dont overwhelm anything
