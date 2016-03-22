@@ -76,7 +76,7 @@ namespace ParticleSDKTests
 The server name or address could not be resolved
 ", result.Error);
 #elif WINDOWS_PHONE_APP
-				Assert.AreEqual("Exception from HRESULT: 0x80072EE7", result.Error);
+				Assert.AreEqual("MovedPermanently", result.Error);
 #else
 				if (Environment.OSVersion.Platform == PlatformID.Unix)
 				{
