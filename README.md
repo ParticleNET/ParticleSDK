@@ -1,3 +1,5 @@
+There is now an offical sdk from Particle [Particle Windows Cloud SDK](https://github.com/spark/particle-windows-sdk)
+
 # Build
 | master | develop |
 |--------|---------|
